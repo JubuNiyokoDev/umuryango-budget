@@ -1,4 +1,49 @@
 {
-  "name": "umuryango_budget",
-  "displayName": "umuryango_budget"
+  "expo": {
+    "name": "Umuryango Budget",
+    "slug": "umuryango-budget",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/final_quest_240x240.png",
+    "userInterfaceStyle": "light",
+    "scheme": "umuryango-budget",
+    "splash": {
+      "image": "./assets/images/final_quest_240x240.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/final_quest_240x240.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "ACCESS_MEDIA_LOCATION",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "ACCESS_MEDIA_LOCATION"
+      ],
+      "package": "com.jubuniyokodev.umuryangobudget"
+    },
+    "web": {
+      "favicon": "./assets/images/final_quest_240x240.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "12660312-fdd0-4256-bc20-123c2bb4d371"
+      }
+    }
+  }
 }
