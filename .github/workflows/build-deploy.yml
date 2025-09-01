@@ -1,62 +1,66 @@
-name: Build Multi-Architecture APKs
+name: Build and Deploy Multi-Architecture APKs
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        
-    - name: Setup Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
-      
-    - name: Install dependencies
-      run: npm install
-      
-    - name: Generate Android project
-      run: |
-        npx react-native init TempProject --template react-native-template-typescript
-        cp -r TempProject/android ./
-        rm -rf TempProject
-        
-    - name: Copy app files
-      run: |
-        cp -r app/* android/app/src/main/java/com/jubuniyokodev/umuryangobudget/
-        cp -r assets android/app/src/main/
-        
-    - name: Build Multi-Architecture APKs
-      run: |
-        cd android
-        chmod +x gradlew
-        ./gradlew assembleRelease
-        
-    - name: Upload APKs to Firebase
-      uses: wzieba/Firebase-Distribution-Github-Action@v1
-      with:
-        appId: ${{ secrets.FIREBASE_APP_ID }}
-        serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        groups: testers
-        file: android/app/build/outputs/apk/release/app-universal-release.apk
-        
-    - name: Deploy to Firebase Hosting
-      uses: FirebaseExtended/action-hosting-deploy@v0
-      with:
-        repoToken: '${{ secrets.GITHUB_TOKEN }}'
-        firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-        projectId: umuryango-budget
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Install dependencies
+        run: npm install -g @react-native-community/cli && npm install
+
+      - name: Generate Android project
+        run: |
+          npx @react-native-community/cli init TempProject --template react-native-template-typescript
+          cp -r TempProject/android ./
+          rm -rf TempProject
+
+      - name: Copy app files
+        run: |
+          cp -r app/* android/app/src/main/java/com/jubuniyokodev/umuryangobudget/
+          cp -r assets android/app/src/main/
+
+      - name: Configure multi-architecture APKs
+        run: |
+          echo "android { splits { abi { reset() enable true universalApk true include \"armeabi-v7a\", \"arm64-v8a\", \"x86\", \"x86_64\" } } }" >> android/app/build.gradle
+
+      - name: Build Multi-Architecture APKs
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+
+      - name: Upload APKs to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          groups: testers
+          file: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: umuryango-budget
