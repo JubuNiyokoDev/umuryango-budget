@@ -68,7 +68,7 @@ jobs:
                 reset()\
                 enable true\
                 universalApk true\
-                include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"\ 
+                include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"\
               }\
             }' android/app/build.gradle
 
@@ -78,23 +78,11 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease
 
-      - name: Upload APKs as artifacts
-        uses: actions/upload-artifact@v4
+      # Upload APKs to GitHub Releases
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
         with:
-          name: apks
-          path: android/app/build/outputs/apk/release/*.apk
-
-      - name: Upload APKs to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          groups: testers
-          file: android/app/build/outputs/apk/release/*.apk
-
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: umuryango-budget
+          tag: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          files: |
+            android/app/build/outputs/apk/release/*.apk
