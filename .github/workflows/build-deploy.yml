@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Cache Node.js modules
+      # Cache node_modules
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -63,13 +63,13 @@ jobs:
       - name: Configure multi-architecture APKs
         run: |
           sed -i '/android {/a\
-            splits {\
-              abi {\
-                reset()\
-                enable true\
-                universalApk true\
-                include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"\
-              }\
+            splits {\ 
+              abi {\ 
+                reset()\ 
+                enable true\ 
+                universalApk true\ 
+                include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"\ 
+              }\ 
             }' android/app/build.gradle
 
       - name: Build Multi-Architecture APKs
@@ -85,7 +85,7 @@ jobs:
           name: apks
           path: android/app/build/outputs/apk/release/*.apk
 
-      # Create GitHub Release
+      # Create GitHub Release (if not exist) using GH_PAT
       - name: Create GitHub Release
         id: gh_release
         uses: softprops/action-gh-release@v1
@@ -100,15 +100,16 @@ jobs:
             - x86_64
             - universal
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
       # Upload all APKs to GitHub Release
       - name: Upload APKs to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: v${{ github.run_number }}
           files: android/app/build/outputs/apk/release/*.apk
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
       # Generate links.json with URLs of all APKs
       - name: Generate links.json
