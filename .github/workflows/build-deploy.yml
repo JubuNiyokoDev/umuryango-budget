@@ -29,18 +29,21 @@ jobs:
     - name: Install dependencies
       run: npm install
       
-    - name: Setup Expo
-      uses: expo/expo-github-action@v8
-      with:
-        expo-version: latest
-        token: ${{ secrets.EXPO_TOKEN }}
+    - name: Generate Android project
+      run: |
+        npx react-native init TempProject --template react-native-template-typescript
+        cp -r TempProject/android ./
+        rm -rf TempProject
         
-    - name: Prebuild Android
-      run: npx expo prebuild --platform android --clear
-      
+    - name: Copy app files
+      run: |
+        cp -r app/* android/app/src/main/java/com/jubuniyokodev/umuryangobudget/
+        cp -r assets android/app/src/main/
+        
     - name: Build Multi-Architecture APKs
       run: |
         cd android
+        chmod +x gradlew
         ./gradlew assembleRelease
         
     - name: Upload APKs to Firebase
