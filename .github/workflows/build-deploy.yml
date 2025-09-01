@@ -3,22 +3,6 @@ name: Build and Deploy Multi-Architecture APKs
 on:
   push:
     branches: [main]
-    paths:
-      - 'android/**'
-      - 'app/**'
-      - 'components/**'
-      - 'contexts/**'
-      - 'hooks/**'
-      - 'utils/**'
-      - 'styles/**'
-      - 'data/**'
-      - 'assets/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'App.tsx'
-      - 'App-expo.tsx'
-      - 'index.js'
-      - 'index.ts'
   workflow_dispatch:
 
 jobs:
