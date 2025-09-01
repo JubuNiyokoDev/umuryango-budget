@@ -35,10 +35,16 @@ jobs:
           cp -r TempProject/android ./
           rm -rf TempProject
 
-      - name: Copy app files
+      - name: Copy assets
         run: |
-          cp -r app/* android/app/src/main/java/com/jubuniyokodev/umuryangobudget/
-          cp -r assets android/app/src/main/
+          mkdir -p android/app/src/main/assets
+          cp -r assets/* android/app/src/main/assets/
+
+      - name: Copy app source files
+        run: |
+          mkdir -p android/app/src/main/res
+          cp -r app/* android/app/src/main/res/
+          cp -r *.js *.ts *.tsx android/app/src/main/res/
 
       - name: Configure multi-architecture APKs
         run: |
