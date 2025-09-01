@@ -27,19 +27,12 @@ jobs:
         uses: android-actions/setup-android@v2
 
       - name: Install dependencies
-        run: npm install -g @react-native-community/cli && npm install
-
-      - name: Generate Android project
-        run: |
-          npx @react-native-community/cli init TempProject
-          echo '{"name": "TempProject", "displayName": "TempProject", "android": {"packageName": "com.jubuniyokodev.umuryangobudget"}}' > TempProject/app.json
-          cp -r TempProject/android ./
-          rm -rf TempProject
+        run: npm install
 
       - name: Copy assets
         run: |
           mkdir -p android/app/src/main/assets
-          cp -r assets/* android/app/src/main/assets/
+          cp -r assets/* android/app/src/main/assets/ || true
 
       - name: Suppress compileSdk warning
         run: |
