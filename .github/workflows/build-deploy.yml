@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Cache node_modules
+      # Cache Node.js modules
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -78,11 +78,54 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease
 
-      # Upload APKs to GitHub Releases
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
+      # Upload APKs as artifacts (all architectures)
+      - name: Upload APKs as artifacts
+        uses: actions/upload-artifact@v4
         with:
-          tag: v${{ github.run_number }}
+          name: apks
+          path: android/app/build/outputs/apk/release/*.apk
+
+      # Create GitHub Release
+      - name: Create GitHub Release
+        id: gh_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
           name: Release v${{ github.run_number }}
-          files: |
-            android/app/build/outputs/apk/release/*.apk
+          body: |
+            Release includes APKs for multiple architectures:
+            - armeabi-v7a
+            - arm64-v8a
+            - x86
+            - x86_64
+            - universal
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload all APKs to GitHub Release
+      - name: Upload APKs to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: android/app/build/outputs/apk/release/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Generate links.json with URLs of all APKs
+      - name: Generate links.json
+        run: |
+          mkdir -p dist
+          echo "{" > dist/links.json
+          for apk in android/app/build/outputs/apk/release/*.apk; do
+            filename=$(basename "$apk")
+            echo "  \"$filename\": \"https://github.com/${GITHUB_REPOSITORY}/releases/download/v${GITHUB_RUN_NUMBER}/$filename\"," >> dist/links.json
+          done
+          # Remove last comma and close JSON
+          sed -i '$ s/,$//' dist/links.json
+          echo "}" >> dist/links.json
+
+      # Upload links.json as artifact
+      - name: Upload links.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: links-json
+          path: dist/links.json
