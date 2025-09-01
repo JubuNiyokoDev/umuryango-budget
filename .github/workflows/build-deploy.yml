@@ -31,7 +31,7 @@ jobs:
 
       - name: Generate Android project
         run: |
-          npx @react-native-community/cli init TempProject --template react-native-template-typescript
+          npx @react-native-community/cli init TempProject
           cp -r TempProject/android ./
           rm -rf TempProject
 
