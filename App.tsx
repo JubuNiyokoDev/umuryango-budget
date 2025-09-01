@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { View, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import SplashScreen from 'react-native-splash-screen';
 
-// Import your app screens
 import HomeScreen from './app/home';
 import BudgetScreen from './app/budget';
 import HistoryScreen from './app/history';
@@ -12,17 +13,14 @@ import BottomNavigation from './components/BottomNavigation';
 
 type Screen = 'home' | 'budget' | 'history' | 'settings' | 'day-details';
 
-function App() {
+export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const renderScreen = () => {
     switch (currentScreen) {
       case 'home':
-        return <HomeScreen onNavigateToDayDetails={(date) => {
-          setSelectedDate(date);
-          setCurrentScreen('day-details');
-        }} />;
+        return <HomeScreen />;
       case 'budget':
         return <BudgetScreen />;
       case 'history':
@@ -30,17 +28,21 @@ function App() {
       case 'settings':
         return <SettingsScreen />;
       case 'day-details':
-        return <DayDetailsScreen 
-          selectedDate={selectedDate} 
-          onBack={() => setCurrentScreen('home')}
-        />;
+        return (
+          <DayDetailsScreen
+            selectedDate={selectedDate}
+            onBack={() => setCurrentScreen('home')}
+          />
+        );
       default:
-        return <HomeScreen onNavigateToDayDetails={(date) => {
-          setSelectedDate(date);
-          setCurrentScreen('day-details');
-        }} />;
+        return <HomeScreen />;
     }
   };
+
+  useEffect(() => {
+    // Masque le splash natif une fois l'app prête
+    SplashScreen.hide();
+  }, []);
 
   return (
     <SafeAreaProvider>
@@ -48,14 +50,12 @@ function App() {
       <View style={{ flex: 1 }}>
         {renderScreen()}
         {currentScreen !== 'day-details' && (
-          <BottomNavigation 
+          <BottomNavigation
             currentTab={currentScreen}
-            onTabPress={(tab) => setCurrentScreen(tab as Screen)}
+            onTabPress={tab => setCurrentScreen(tab as Screen)}
           />
         )}
       </View>
     </SafeAreaProvider>
   );
 }
-
-export default App;

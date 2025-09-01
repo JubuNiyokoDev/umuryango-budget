@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Alert, StyleSheet } from 'react-native';
 import { useStyles } from '../styles/commonStyles';
+import { useTranslation } from '../hooks/useTranslation';
 import Icon from './Icon';
 import LoadingButton from './LoadingButton';
 import { Meal, MealItem } from '../types/budget';
@@ -26,19 +27,20 @@ export default function MealSection({
   disabled = false
 }: MealSectionProps) {
   const { colors, commonStyles } = useStyles();
+  const { t } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
   const [itemName, setItemName] = useState('');
   const [itemPrice, setItemPrice] = useState('');
 
   const handleAddItem = async () => {
     if (!itemName.trim() || !itemPrice.trim()) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert(t('error'), t('fillAllFields'));
       return;
     }
 
     const price = parseFloat(itemPrice);
     if (isNaN(price) || price <= 0) {
-      Alert.alert('Erreur', 'Veuillez entrer un prix valide');
+      Alert.alert(t('error'), t('pleaseEnterValidPrice'));
       return;
     }
 
@@ -54,12 +56,12 @@ export default function MealSection({
 
   const handleRemoveItem = (itemId: string) => {
     Alert.alert(
-      'Supprimer l\'article',
-      'Êtes-vous sûr de vouloir supprimer cet article?',
+      t('deleteItem'),
+      t('confirmDeleteItem'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Supprimer',
+          text: t('delete'),
           style: 'destructive',
           onPress: () => onRemoveItem(itemId),
         },
@@ -103,7 +105,7 @@ export default function MealSection({
             <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
             {item.contributor && (
               <Text style={[styles.contributor, { color: colors.textSecondary }]}>
-                Par: {item.contributor}
+                {t('by')}: {item.contributor}
               </Text>
             )}
           </View>
@@ -126,7 +128,7 @@ export default function MealSection({
 
       {meal.items.length === 0 && (
         <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-          Aucun article ajouté
+          {t('noItemsAdded')}
         </Text>
       )}
 
@@ -135,7 +137,7 @@ export default function MealSection({
         <View style={[styles.addForm, { backgroundColor: colors.backgroundAlt, borderColor: colors.border }]}>
           <TextInput
             style={[commonStyles.input, { backgroundColor: colors.backgroundAlt, borderColor: colors.border, color: colors.text }]}
-            placeholder="Nom de l'article"
+            placeholder={t('itemName')}
             placeholderTextColor={colors.textSecondary}
             value={itemName}
             onChangeText={setItemName}
@@ -143,7 +145,7 @@ export default function MealSection({
           
           <TextInput
             style={[commonStyles.input, { marginTop: 8, backgroundColor: colors.backgroundAlt, borderColor: colors.border, color: colors.text }]}
-            placeholder={`Prix (${currency})`}
+            placeholder={`${t('price')} (${currency})`}
             placeholderTextColor={colors.textSecondary}
             value={itemPrice}
             onChangeText={setItemPrice}
@@ -152,7 +154,7 @@ export default function MealSection({
           
           <View style={styles.formActions}>
             <LoadingButton
-              title="Annuler"
+              title={t('cancel')}
               onPress={() => {
                 setShowAddForm(false);
                 setItemName('');
@@ -162,7 +164,7 @@ export default function MealSection({
               style={{ flex: 1 }}
             />
             <LoadingButton
-              title="Ajouter"
+              title={t('add')}
               onPress={handleAddItem}
               style={{ flex: 1 }}
               icon="add"

@@ -37,7 +37,7 @@ export default function PinModal({
     if (mode === 'create') {
       if (step === 'enter') {
         if (pin.length < 4) {
-          Alert.alert('Erreur', 'Le PIN doit contenir au moins 4 chiffres');
+          Alert.alert(t('error'), t('pinMustBe4Digits'));
           return;
         }
         setStep('confirm');
@@ -45,7 +45,7 @@ export default function PinModal({
       }
       
       if (pin !== confirmPin) {
-        Alert.alert('Erreur', 'Les PINs ne correspondent pas');
+        Alert.alert(t('error'), t('pinsDoNotMatch'));
         setConfirmPin('');
         return;
       }
@@ -57,15 +57,15 @@ export default function PinModal({
             onSuccess();
             resetModal();
           } else {
-            Alert.alert('Erreur', 'Impossible de créer le PIN');
+            Alert.alert(t('error'), t('cannotCreatePin'));
           }
         } catch (error) {
-          Alert.alert('Erreur', 'Une erreur est survenue lors de la création du PIN');
+          Alert.alert(t('error'), t('errorCreatingPin'));
         }
       }
     } else {
       if (pin.length < 4) {
-        Alert.alert('Erreur', 'Veuillez entrer votre PIN');
+        Alert.alert(t('error'), t('pleaseEnterPin'));
         return;
       }
       
@@ -76,11 +76,11 @@ export default function PinModal({
             onSuccess();
             resetModal();
           } else {
-            Alert.alert('Erreur', 'PIN incorrect');
+            Alert.alert(t('error'), t('incorrectPin'));
             setPin('');
           }
         } catch (error) {
-          Alert.alert('Erreur', 'Une erreur est survenue lors de la vérification du PIN');
+          Alert.alert(t('error'), t('errorVerifyingPin'));
           setPin('');
         }
       }
@@ -96,7 +96,7 @@ export default function PinModal({
 
   const getCurrentTitle = () => {
     if (mode === 'create') {
-      return step === 'enter' ? 'Créer un PIN' : 'Confirmer le PIN';
+      return step === 'enter' ? t('createPin') : t('confirmPin');
     }
     return title;
   };
@@ -104,17 +104,17 @@ export default function PinModal({
   const getCurrentDescription = () => {
     if (mode === 'create') {
       return step === 'enter' 
-        ? 'Créez un PIN de sécurité pour protéger vos données'
-        : 'Confirmez votre PIN';
+        ? t('createSecurityPin')
+        : t('confirmYourPin');
     }
     return description;
   };
 
   const getCurrentPlaceholder = () => {
     if (mode === 'create') {
-      return step === 'enter' ? 'Entrez votre PIN' : 'Confirmez votre PIN';
+      return step === 'enter' ? t('enterPin') : t('confirmPin');
     }
-    return 'Entrez votre PIN';
+    return t('enterPin');
   };
 
   const getCurrentValue = () => {
@@ -178,7 +178,7 @@ export default function PinModal({
               style={{ flex: 1 }}
             />
             <LoadingButton
-              title={mode === 'create' && step === 'enter' ? 'Suivant' : t('confirm')}
+              title={mode === 'create' && step === 'enter' ? t('next') : t('confirm')}
               onPress={handleSubmit}
               style={{ flex: 1 }}
             />

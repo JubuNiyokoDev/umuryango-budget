@@ -11,8 +11,9 @@ import Icon from '../components/Icon';
 import MonthSelector from '../components/MonthSelector';
 import Shimmer from '../components/Shimmer';
 import { useTranslation } from '../hooks/useTranslation';
+import { translateMonth } from '../utils/dateUtils';
 
-export default function HomeScreen() {
+function HomeScreen() {
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
   const { isFirstLaunch, loading: pinLoading } = usePin();
@@ -52,7 +53,9 @@ export default function HomeScreen() {
 
   if (loading || pinLoading) {
     return (
-      <View style={[commonStyles.container, { backgroundColor: colors.background }]}>
+      <View
+        style={[commonStyles.container, { backgroundColor: colors.background }]}
+      >
         <View style={commonStyles.content}>
           <View style={[commonStyles.row, { marginBottom: 20 }]}>
             <Shimmer width={200} height={32} />
@@ -68,10 +71,14 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={[commonStyles.container, { backgroundColor: colors.background }]}>
+    <View
+      style={[commonStyles.container, { backgroundColor: colors.background }]}
+    >
       <View style={commonStyles.content}>
         <View style={[commonStyles.row, { marginBottom: 20 }]}>
-          <Text style={[commonStyles.title, { color: colors.text }]}>{t('home')}</Text>
+          <Text style={[commonStyles.title, { color: colors.text }]}>
+            {t('home')}
+          </Text>
           <TouchableOpacity onPress={handleSettingsPress}>
             <Icon name="settings-outline" size={24} color={colors.text} />
           </TouchableOpacity>
@@ -85,9 +92,17 @@ export default function HomeScreen() {
           >
             <View style={commonStyles.row}>
               <Text style={[commonStyles.subtitle, { color: colors.text }]}>
-                {selectedMonth?.displayName || 'Sélectionner le mois'}
+                {selectedMonth
+                  ? `${translateMonth(selectedMonth.month, t)} ${
+                      selectedMonth.year
+                    }`
+                  : t('selectMonth')}
               </Text>
-              <Icon name="chevron-down" size={20} color={colors.textSecondary} />
+              <Icon
+                name="chevron-down"
+                size={20}
+                color={colors.textSecondary}
+              />
             </View>
           </TouchableOpacity>
 
@@ -104,35 +119,57 @@ export default function HomeScreen() {
           {/* Quick Stats */}
           {currentMonthBudget && (
             <View style={[commonStyles.card, { backgroundColor: colors.card }]}>
-              <Text style={[commonStyles.subtitle, { color: colors.text }]}>Résumé du mois</Text>
-              
+              <Text style={[commonStyles.subtitle, { color: colors.text }]}>
+                {t('monthSummary')}
+              </Text>
+
               <View style={styles.statsGrid}>
                 <View style={styles.statItem}>
                   <Text style={[styles.statValue, { color: colors.primary }]}>
                     {currentMonthBudget.totalBudget.toLocaleString()}
                   </Text>
-                  <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Budget total</Text>
+                  <Text
+                    style={[styles.statLabel, { color: colors.textSecondary }]}
+                  >
+                    {t('totalBudgetLabel')}
+                  </Text>
                 </View>
-                
+
                 <View style={styles.statItem}>
                   <Text style={[styles.statValue, { color: colors.success }]}>
                     {currentMonthBudget.consumedBudget.toLocaleString()}
                   </Text>
-                  <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Consommé</Text>
+                  <Text
+                    style={[styles.statLabel, { color: colors.textSecondary }]}
+                  >
+                    {t('consumedLabel')}
+                  </Text>
                 </View>
-                
+
                 <View style={styles.statItem}>
                   <Text style={[styles.statValue, { color: colors.warning }]}>
                     {currentMonthBudget.days.filter(d => d.validated).length}
                   </Text>
-                  <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Jours validés</Text>
+                  <Text
+                    style={[styles.statLabel, { color: colors.textSecondary }]}
+                  >
+                    {t('validatedDaysLabel')}
+                  </Text>
                 </View>
-                
+
                 <View style={styles.statItem}>
                   <Text style={[styles.statValue, { color: colors.primary }]}>
-                    {currentMonthBudget.days.filter(d => d.status === 'planned').length}
+                    {
+                      currentMonthBudget.days.filter(
+                        d => d.status === 'planned',
+                      ).length
+                    }
                   </Text>
-                  <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Jours planifiés</Text>
+                  <Text
+                    style={[styles.statLabel, { color: colors.textSecondary }]}
+                  >
+                    {t('plannedDaysLabel')}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -169,7 +206,7 @@ const styles = {
   },
   statItem: {
     flex: 1,
-    minWidth: '45%',
+    minWidth: '45%' as any,
     alignItems: 'center' as const,
     padding: 12,
   },
@@ -183,3 +220,5 @@ const styles = {
     textAlign: 'center' as const,
   },
 };
+
+export default HomeScreen;

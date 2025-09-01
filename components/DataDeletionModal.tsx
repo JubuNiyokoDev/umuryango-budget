@@ -43,7 +43,7 @@ export default function DataDeletionModal({
     const monthsToDelete = deleteAll ? availableMonths.map(m => m.id) : selectedMonths;
     
     if (monthsToDelete.length === 0) {
-      Alert.alert('Erreur', 'Veuillez sélectionner au moins un mois à supprimer');
+      Alert.alert(t('error'), t('selectAtLeastOneMonth'));
       return;
     }
 
@@ -52,12 +52,12 @@ export default function DataDeletionModal({
       : monthsToDelete.map(id => availableMonths.find(m => m.id === id)?.displayName).filter(Boolean);
 
     Alert.alert(
-      'Confirmer la suppression',
-      `Êtes-vous sûr de vouloir supprimer ${monthNames.join(', ')} ?\n\nCette action est irréversible.`,
+      t('confirmDeletion'),
+      t('confirmDeletionMessage').replace('{items}', monthNames.join(', ')),
       [
         { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Supprimer',
+          text: t('delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -65,7 +65,7 @@ export default function DataDeletionModal({
               resetModal();
             } catch (error) {
               console.log('Delete error:', error);
-              Alert.alert('Erreur', 'Impossible de supprimer les données');
+              Alert.alert(t('error'), t('cannotDeleteData'));
             }
           },
         },
@@ -91,10 +91,10 @@ export default function DataDeletionModal({
           <View style={styles.header}>
             <Icon name="trash" size={32} color={colors.error} />
             <Text style={[styles.title, { color: colors.text }]}>
-              Supprimer les données
+              {t('deleteData')}
             </Text>
             <Text style={[styles.description, { color: colors.textSecondary }]}>
-              Sélectionnez les données à supprimer. Votre PIN sera requis pour confirmer.
+              {t('selectDataToDeleteDescription')}
             </Text>
           </View>
 
@@ -118,10 +118,10 @@ export default function DataDeletionModal({
                 />
                 <View style={styles.optionText}>
                   <Text style={[styles.optionTitle, { color: deleteAll ? colors.error : colors.text }]}>
-                    Supprimer toutes les données
+                    {t('deleteAllData')}
                   </Text>
                   <Text style={[styles.optionSubtitle, { color: colors.textSecondary }]}>
-                    Efface complètement l'historique et toutes les données
+                    {t('deleteAllDataDescription')}
                   </Text>
                 </View>
               </View>
@@ -131,7 +131,7 @@ export default function DataDeletionModal({
             {!deleteAll && (
               <>
                 <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  Ou sélectionnez des mois spécifiques:
+                  {t('orSelectSpecificMonths')}
                 </Text>
                 
                 {availableMonths.map((month) => (
@@ -177,7 +177,7 @@ export default function DataDeletionModal({
               style={{ flex: 1 }}
             />
             <LoadingButton
-              title="Supprimer"
+              title={t('delete')}
               onPress={handleDelete}
               variant="danger"
               style={{ flex: 1 }}

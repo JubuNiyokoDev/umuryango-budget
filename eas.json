@@ -1,29 +1,46 @@
 {
   "cli": {
-    "version": ">= 7.8.6",
-    "appVersionSource": "local"
+    "version": ">= 12.0.0"
   },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
+    "installer": {
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       }
     },
-    "preview": {
-      "distribution": "internal",
+    "arm64": {
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "env": {
+          "EXPO_PUBLIC_ARCHITECTURE": "arm64-v8a"
+        }
       }
     },
-    "production": {
+    "arm32": {
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "env": {
+          "EXPO_PUBLIC_ARCHITECTURE": "armeabi-v7a"
+        }
+      }
+    },
+    "x86": {
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "env": {
+          "EXPO_PUBLIC_ARCHITECTURE": "x86_64"
+        }
+      }
+    },
+    "universal": {
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       }
     }
-  },
-  "submit": {
-    "production": {}
   }
 }

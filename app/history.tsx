@@ -9,8 +9,9 @@ import { router } from 'expo-router';
 import Icon from '../components/Icon';
 import Shimmer from '../components/Shimmer';
 import { useTranslation } from '../hooks/useTranslation';
+import { translateMonth } from '../utils/dateUtils';
 
-export default function HistoryScreen() {
+function HistoryScreen() {
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
   const [selectedMonth, setSelectedMonth] = useState<MonthlyBudget | null>(null);
@@ -105,28 +106,28 @@ export default function HistoryScreen() {
                   >
                     <View style={commonStyles.row}>
                       <Text style={[commonStyles.subtitle, { color: colors.text }]}>
-                        {month.month} {month.year}
+                        {translateMonth(month.month, t)} {month.year}
                       </Text>
                       <Icon name="chevron-forward" size={20} color={colors.textSecondary} />
                     </View>
 
                     <View style={styles.monthStats}>
                       <View style={styles.statRow}>
-                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Budget total:</Text>
+                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('totalBudgetLabel')}:</Text>
                         <Text style={[styles.statValue, { color: colors.primary }]}>
                           {month.totalBudget.toLocaleString()} {t('currency')}
                         </Text>
                       </View>
                       
                       <View style={styles.statRow}>
-                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Consommé:</Text>
+                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('consumedLabel')}:</Text>
                         <Text style={[styles.statValue, { color: colors.success }]}>
                           {month.consumedBudget.toLocaleString()} {t('currency')}
                         </Text>
                       </View>
                       
                       <View style={styles.statRow}>
-                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Jours validés:</Text>
+                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('validatedDaysLabel')}:</Text>
                         <Text style={[styles.statValue, { color: colors.text }]}>
                           {stats.validatedDays}/{stats.totalDays}
                         </Text>
@@ -163,7 +164,7 @@ export default function HistoryScreen() {
             <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
               <View style={[commonStyles.row, { marginBottom: 20 }]}>
                 <Text style={[commonStyles.title, { color: colors.text }]}>
-                  {selectedMonth.month} {selectedMonth.year}
+                  {translateMonth(selectedMonth.month, t)} {selectedMonth.year}
                 </Text>
                 <TouchableOpacity onPress={() => setShowMonthDetails(false)}>
                   <Icon name="close" size={24} color={colors.text} />
@@ -207,7 +208,7 @@ export default function HistoryScreen() {
 
                 {/* Days List */}
                 <View style={styles.daysSection}>
-                  <Text style={[commonStyles.subtitle, { color: colors.text }]}>Jours du mois</Text>
+                  <Text style={[commonStyles.subtitle, { color: colors.text }]}>{t('daysOfMonth')}</Text>
                   
                   {selectedMonth.days
                     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -352,3 +353,5 @@ const styles = {
     fontWeight: '600' as const,
   },
 };
+
+export default HistoryScreen;

@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useStyles } from '../styles/commonStyles';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface BudgetChartProps {
   totalBudget: number;
@@ -11,6 +12,7 @@ interface BudgetChartProps {
 
 export default function BudgetChart({ totalBudget, consumedBudget, currency }: BudgetChartProps) {
   const { colors } = useStyles();
+  const { t } = useTranslation();
 
   const percentage = totalBudget > 0 ? (consumedBudget / totalBudget) * 100 : 0;
   const remainingBudget = totalBudget - consumedBudget;
@@ -57,7 +59,7 @@ export default function BudgetChart({ totalBudget, consumedBudget, currency }: B
             {Math.round(percentage)}%
           </Text>
           <Text style={[styles.labelText, { color: colors.textSecondary }]}>
-            Consommé
+            {t('consumedLabel')}
           </Text>
         </View>
       </View>
@@ -67,14 +69,14 @@ export default function BudgetChart({ totalBudget, consumedBudget, currency }: B
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.success }]} />
           <Text style={[styles.legendText, { color: colors.textSecondary }]}>
-            Consommé: {consumedBudget.toLocaleString()} {currency}
+            {t('consumedLabel')}: {consumedBudget.toLocaleString()} {currency}
           </Text>
         </View>
         
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.border }]} />
           <Text style={[styles.legendText, { color: colors.textSecondary }]}>
-            Restant: {remainingBudget.toLocaleString()} {currency}
+            {t('remainingLabel')}: {remainingBudget.toLocaleString()} {currency}
           </Text>
         </View>
       </View>

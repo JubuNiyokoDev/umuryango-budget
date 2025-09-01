@@ -91,12 +91,12 @@ export default function DayDetailsScreen() {
     if (!date || !dayBudget) return;
 
     if (dayBudget.validated) {
-      Alert.alert('Information', 'Ce jour est déjà validé');
+      Alert.alert(t('information'), t('dayAlreadyValidated'));
       return;
     }
 
     if (dayBudget.total === 0) {
-      Alert.alert('Attention', 'Aucun repas planifié pour ce jour. Voulez-vous quand même valider?', [
+      Alert.alert(t('warning'), t('noMealsPlannedValidateAnyway'), [
         { text: t('cancel'), style: 'cancel' },
         {
           text: t('confirm'),
@@ -114,7 +114,7 @@ export default function DayDetailsScreen() {
 
     Alert.alert(
       t('confirm'),
-      `Valider ce jour avec un total de ${dayBudget.total.toLocaleString()} ${t('currency')}?\n\nUne fois validé, ce jour ne pourra plus être modifié.`,
+      t('validateDayConfirmation').replace('{amount}', dayBudget.total.toLocaleString()).replace('{currency}', t('currency')),
       [
         { text: t('cancel'), style: 'cancel' },
         {
@@ -123,7 +123,6 @@ export default function DayDetailsScreen() {
             console.log('Validating day:', date);
             await validateDay(date);
             Alert.alert(t('success'), t('dayValidatedSuccessfully'));
-            // Wait a bit for the data to be saved, then reload
             setTimeout(() => {
               loadDayBudget();
             }, 500);
@@ -167,17 +166,17 @@ export default function DayDetailsScreen() {
   };
 
   const getStatusInfo = () => {
-    if (!dayBudget) return { text: 'Non planifié', color: colors.textSecondary };
+    if (!dayBudget) return { text: t('notPlanned'), color: colors.textSecondary };
     
     if (dayBudget.validated) {
-      return { text: 'Validé', color: colors.success };
+      return { text: t('validated'), color: colors.success };
     }
     
     if (dayBudget.total > 0) {
-      return { text: 'Planifié', color: colors.primary };
+      return { text: t('planned'), color: colors.primary };
     }
     
-    return { text: 'En attente', color: colors.warning };
+    return { text: t('pending'), color: colors.warning };
   };
 
   const isToday = () => {
@@ -201,7 +200,7 @@ export default function DayDetailsScreen() {
   if (!date) {
     return (
       <View style={[commonStyles.container, commonStyles.center]}>
-        <Text style={[commonStyles.text, { color: colors.text }]}>Date non spécifiée</Text>
+        <Text style={[commonStyles.text, { color: colors.text }]}>{t('dateNotSpecified')}</Text>
       </View>
     );
   }
@@ -227,7 +226,7 @@ export default function DayDetailsScreen() {
               {formatDate(date)}
             </Text>
             <View style={[commonStyles.row, { marginTop: 8 }]}>
-              <Text style={[commonStyles.text, { color: colors.text }]}>Statut:</Text>
+              <Text style={[commonStyles.text, { color: colors.text }]}>{t('status')}:</Text>
               <View style={styles.statusBadge}>
                 <View style={[styles.statusDot, { backgroundColor: statusInfo.color }]} />
                 <Text style={[commonStyles.text, { color: statusInfo.color, fontWeight: '600' }]}>
@@ -238,7 +237,7 @@ export default function DayDetailsScreen() {
             
             {dayBudget?.validatedAt && (
               <Text style={[commonStyles.textSecondary, { marginTop: 4, color: colors.textSecondary }]}>
-                Validé le {new Date(dayBudget.validatedAt).toLocaleDateString('fr-FR')}
+                {t('validatedOn')} {new Date(dayBudget.validatedAt).toLocaleDateString('fr-FR')}
               </Text>
             )}
 
@@ -246,7 +245,7 @@ export default function DayDetailsScreen() {
               <View style={[styles.warningBanner, { backgroundColor: isPast() ? colors.primary + '20' : colors.warning + '20' }]}>
                 <Icon name={isPast() ? "eye" : "lock-closed"} size={16} color={isPast() ? colors.primary : colors.warning} />
                 <Text style={[commonStyles.textSecondary, { color: isPast() ? colors.primary : colors.warning, marginLeft: 8 }]}>
-                  {isPast() ? 'Mode lecture seule - Jour passé' : t('dayCannotBeEdited')}
+                  {isPast() ? t('readOnlyModePastDay') : t('dayCannotBeEdited')}
                 </Text>
               </View>
             )}
@@ -258,10 +257,10 @@ export default function DayDetailsScreen() {
               <View style={[commonStyles.center, { padding: 20 }]}>
                 <Icon name="calendar-outline" size={48} color={colors.textSecondary} />
                 <Text style={[commonStyles.text, { marginTop: 16, textAlign: 'center', color: colors.textSecondary }]}>
-                  Aucune planification pour ce jour
+                  {t('noPlanningForThisDay')}
                 </Text>
                 <Text style={[commonStyles.textSecondary, { marginTop: 8, textAlign: 'center', color: colors.textSecondary }]}>
-                  Ce jour est passé et n'avait pas de repas planifiés
+                  {t('pastDayNoMealsPlanned')}
                 </Text>
               </View>
             </View>
@@ -317,7 +316,7 @@ export default function DayDetailsScreen() {
             {/* Spending Level Indicator */}
             {dayBudget?.spendingLevel && (
               <View style={[commonStyles.row, { marginTop: 8 }]}>
-                <Text style={[commonStyles.textSecondary, { color: colors.textSecondary }]}>Niveau de dépense:</Text>
+                <Text style={[commonStyles.textSecondary, { color: colors.textSecondary }]}>{t('spendingLevel')}:</Text>
                 <Text style={[
                   commonStyles.text,
                   {

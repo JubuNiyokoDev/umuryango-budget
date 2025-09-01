@@ -4,37 +4,31 @@
     "slug": "umuryango-budget",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/final_quest_240x240.png",
+    "icon": "./assets/icons/icon.png",
     "userInterfaceStyle": "light",
     "scheme": "umuryango-budget",
     "splash": {
-      "image": "./assets/images/final_quest_240x240.png",
-      "resizeMode": "contain",
+      "image": "./assets/images/splash.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": "./assets/icons/icon.png",
+      "bundleIdentifier": "com.jubuniyokodev.umuryangobudget"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/final_quest_240x240.png",
+        "foregroundImage": "./assets/icons/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "WRITE_EXTERNAL_STORAGE",
-        "READ_EXTERNAL_STORAGE",
-        "ACCESS_MEDIA_LOCATION",
-        "WRITE_EXTERNAL_STORAGE",
-        "READ_EXTERNAL_STORAGE",
-        "ACCESS_MEDIA_LOCATION"
-      ],
       "package": "com.jubuniyokodev.umuryangobudget"
     },
     "web": {
-      "favicon": "./assets/images/final_quest_240x240.png"
+      "favicon": "./assets/icons/icon.png"
     },
     "plugins": [
       "expo-router"

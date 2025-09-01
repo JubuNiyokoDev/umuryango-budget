@@ -3,6 +3,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useStyles } from '../styles/commonStyles';
 import { DayBudget } from '../types/budget';
+import { useTranslation } from '../hooks/useTranslation';
+import { translateMonth } from '../utils/dateUtils';
 
 interface CalendarProps {
   month: number;
@@ -13,6 +15,7 @@ interface CalendarProps {
 
 export default function Calendar({ month, year, days, onDayPress }: CalendarProps) {
   const { colors, commonStyles } = useStyles();
+  const { t } = useTranslation();
 
   const getDaysInMonth = (month: number, year: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -142,7 +145,7 @@ export default function Calendar({ month, year, days, onDayPress }: CalendarProp
 
   const renderCalendar = () => {
     const calendar = [];
-    const weekDays = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+    const weekDays = [t('sun'), t('mon'), t('tue'), t('wed'), t('thu'), t('fri'), t('sat')];
     
     // Week day headers
     calendar.push(
@@ -194,22 +197,22 @@ export default function Calendar({ month, year, days, onDayPress }: CalendarProp
   return (
     <View style={[commonStyles.card, { backgroundColor: colors.card }]}>
       <Text style={[commonStyles.subtitle, { color: colors.text }]}>
-        {new Date(year, month).toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}
+        {translateMonth(month, t)} {year}
       </Text>
       
       {/* Legend with better color distinction */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.success }]} />
-          <Text style={[styles.legendText, { color: colors.textSecondary }]}>Payé</Text>
+          <Text style={[styles.legendText, { color: colors.textSecondary }]}>{t('paid')}</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.warning }]} />
-          <Text style={[styles.legendText, { color: colors.textSecondary }]}>Aujourd'hui</Text>
+          <Text style={[styles.legendText, { color: colors.textSecondary }]}>{t('today')}</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
-          <Text style={[styles.legendText, { color: colors.textSecondary }]}>Planifié</Text>
+          <Text style={[styles.legendText, { color: colors.textSecondary }]}>{t('planned')}</Text>
         </View>
       </View>
       

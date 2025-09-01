@@ -9,8 +9,9 @@ import Icon from '../components/Icon';
 import LoadingButton from '../components/LoadingButton';
 import Shimmer from '../components/Shimmer';
 import { useTranslation } from '../hooks/useTranslation';
+import { translateMonth } from '../utils/dateUtils';
 
-export default function BudgetScreen() {
+function BudgetScreen() {
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
   const [showAddContributor, setShowAddContributor] = useState(false);
@@ -30,20 +31,20 @@ export default function BudgetScreen() {
   const handleAddContributor = async () => {
     if (!currentMonthBudget || currentMonthBudget.totalBudget === 0) {
       Alert.alert(
-        'Budget requis',
-        'Vous devez d\'abord planifier un budget pour ce mois avant d\'ajouter des contributeurs. Planifiez vos repas dans le calendrier pour générer automatiquement le budget.'
+        t('budgetRequired'),
+        t('budgetRequiredMessage')
       );
       return;
     }
 
     if (!contributorName.trim() || !contributorAmount.trim()) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert(t('error'), t('fillAllFields'));
       return;
     }
 
     const amount = parseFloat(contributorAmount);
     if (isNaN(amount) || amount <= 0) {
-      Alert.alert('Erreur', 'Veuillez entrer un montant valide');
+      Alert.alert(t('error'), t('pleaseEnterValidAmount'));
       return;
     }
 
@@ -53,10 +54,10 @@ export default function BudgetScreen() {
       setContributorName('');
       setContributorAmount('');
       setShowAddContributor(false);
-      Alert.alert('Succès', 'Contributeur ajouté avec succès');
+      Alert.alert(t('success'), t('contributorAdded'));
     } catch (error) {
       console.log('Error adding contributor:', error);
-      Alert.alert('Erreur', 'Impossible d\'ajouter le contributeur');
+      Alert.alert(t('error'), t('cannotAddContributor'));
     } finally {
       setLoading(false);
     }
@@ -64,8 +65,8 @@ export default function BudgetScreen() {
 
   const handleUpdateContributorPayment = async (contributorId: string, currentPaid: number) => {
     Alert.prompt(
-      'Mettre à jour le paiement',
-      'Entrez le nouveau montant payé:',
+      t('updatePayment'),
+      t('enterNewPaidAmount'),
       [
         { text: 'Annuler', style: 'cancel' },
         {
@@ -75,17 +76,17 @@ export default function BudgetScreen() {
             
             const amount = parseFloat(value);
             if (isNaN(amount) || amount < 0) {
-              Alert.alert('Erreur', 'Veuillez entrer un montant valide');
+              Alert.alert(t('error'), t('pleaseEnterValidAmount'));
               return;
             }
 
             setLoading(true);
             try {
               await updateContributor(contributorId, { paidAmount: amount });
-              Alert.alert('Succès', 'Paiement mis à jour');
+              Alert.alert(t('success'), t('paymentUpdated'));
             } catch (error) {
               console.log('Error updating payment:', error);
-              Alert.alert('Erreur', 'Impossible de mettre à jour le paiement');
+              Alert.alert(t('error'), t('cannotUpdatePayment'));
             } finally {
               setLoading(false);
             }
@@ -123,11 +124,11 @@ export default function BudgetScreen() {
           {/* Budget Overview */}
           <View style={[commonStyles.card, { backgroundColor: colors.card }]}>
             <Text style={[commonStyles.subtitle, { color: colors.text }]}>
-              {currentMonthBudget?.month} {currentMonthBudget?.year}
+              {currentMonthBudget ? `${translateMonth(currentMonthBudget.month, t)} ${currentMonthBudget.year}` : ''}
             </Text>
             
             <Text style={[commonStyles.textSecondary, { marginBottom: 16, color: colors.textSecondary }]}>
-              {t('budgetCalculatedAutomatically')}
+              {t('budgetCalculatedFromMeals')}
             </Text>
 
             {currentMonthBudget && (
@@ -140,21 +141,21 @@ export default function BudgetScreen() {
 
             <View style={styles.budgetStats}>
               <View style={styles.statItem}>
-                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('totalBudget')}</Text>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('totalBudgetLabel')}</Text>
                 <Text style={[styles.statValue, { color: colors.text }]}>
                   {currentMonthBudget?.totalBudget.toLocaleString() || '0'} {t('currency')}
                 </Text>
               </View>
               
               <View style={styles.statItem}>
-                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('consumed')}</Text>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('consumedLabel')}</Text>
                 <Text style={[styles.statValue, { color: colors.success }]}>
                   {currentMonthBudget?.consumedBudget.toLocaleString() || '0'} {t('currency')}
                 </Text>
               </View>
               
               <View style={styles.statItem}>
-                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('remaining')}</Text>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('remainingLabel')}</Text>
                 <Text style={[styles.statValue, { color: colors.primary }]}>
                   {currentMonthBudget?.remainingBudget.toLocaleString() || '0'} {t('currency')}
                 </Text>
@@ -177,7 +178,7 @@ export default function BudgetScreen() {
 
             {(!currentMonthBudget || currentMonthBudget.totalBudget === 0) && (
               <Text style={[commonStyles.textSecondary, { marginTop: 8, fontStyle: 'italic', color: colors.textSecondary }]}>
-                Planifiez d'abord votre budget mensuel pour ajouter des contributeurs
+                {t('planFirstBudget')}
               </Text>
             )}
 
@@ -212,7 +213,7 @@ export default function BudgetScreen() {
 
             {currentMonthBudget?.contributors.length === 0 && currentMonthBudget.totalBudget > 0 && (
               <Text style={[commonStyles.textSecondary, { textAlign: 'center', marginTop: 16, color: colors.textSecondary }]}>
-                Aucun contributeur ajouté
+                {t('noContributorsAdded')}
               </Text>
             )}
           </View>
@@ -333,7 +334,7 @@ const styles = {
     padding: 20,
   },
   modalContent: {
-    width: '100%',
+    width: '100%' as any,
     maxWidth: 400,
     borderRadius: 16,
     padding: 24,
@@ -350,3 +351,5 @@ const styles = {
     marginTop: 20,
   },
 };
+
+export default BudgetScreen;

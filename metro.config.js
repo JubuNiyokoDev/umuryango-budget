@@ -2,14 +2,7 @@ const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
-// Disable source maps to fix the <anonymous> error
-config.transformer.minifierConfig = {
-  keep_fnames: true,
-  mangle: {
-    keep_fnames: true,
-  },
-};
-
-config.resolver.sourceExts.push('cjs');
+// Résoudre les conflits de dépendances
+config.resolver.platforms = ['native', 'android', 'ios', 'web'];
 
 module.exports = config;
