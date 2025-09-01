@@ -40,15 +40,17 @@ jobs:
           mkdir -p android/app/src/main/assets
           cp -r assets/* android/app/src/main/assets/
 
-      - name: Copy app source files
-        run: |
-          mkdir -p android/app/src/main/res
-          cp -r app/* android/app/src/main/res/
-          cp -r *.js *.ts *.tsx android/app/src/main/res/
-
       - name: Configure multi-architecture APKs
         run: |
-          echo "android { splits { abi { reset() enable true universalApk true include \"armeabi-v7a\", \"arm64-v8a\", \"x86\", \"x86_64\" } } }" >> android/app/build.gradle
+          sed -i '/android {/a\
+            splits {\
+              abi {\
+                reset()\
+                enable true\
+                universalApk true\
+                include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"\
+              }\
+            }' android/app/build.gradle
 
       - name: Build Multi-Architecture APKs
         run: |
