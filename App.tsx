@@ -10,6 +10,7 @@ import HistoryScreen from './app/history';
 import SettingsScreen from './app/settings';
 import DayDetailsScreen from './app/day-details-simple';
 import BottomNavigation from './components/BottomNavigation';
+import UpdateManager from './UpdateManager';
 
 type Screen = 'home' | 'budget' | 'history' | 'settings' | 'day-details';
 
@@ -55,6 +56,7 @@ export default function App() {
             onTabPress={tab => setCurrentScreen(tab as Screen)}
           />
         )}
+        <UpdateManager />
       </View>
     </SafeAreaProvider>
   );

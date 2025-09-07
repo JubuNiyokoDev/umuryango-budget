@@ -53,11 +53,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Copy assets
-      - name: Copy assets
+      # Copy assets and resources
+      - name: Copy assets and resources
         run: |
           mkdir -p android/app/src/main/assets
           cp -r assets/* android/app/src/main/assets/ || true
+          
+          # Copier les ressources (icons, strings, etc.)
+          cp -r android/app/src/main/res/* android/app/src/main/res/ || true
+          
+          # S'assurer que le manifest est identique
+          cp android/app/src/main/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
 
       # Suppress compileSdk warning
       - name: Suppress compileSdk warning
