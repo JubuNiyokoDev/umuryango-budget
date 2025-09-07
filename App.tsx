@@ -18,6 +18,11 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
+  useEffect(() => {
+    // Masque le splash natif une fois l'app prête
+    SplashScreen.hide();
+  }, []);
+
   const renderScreen = () => {
     switch (currentScreen) {
       case 'home':
