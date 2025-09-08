@@ -15,7 +15,7 @@ import { useAppState } from '../contexts/AppStateContext';
 import { translateMonth } from '../utils/dateUtils';
 import { AdBanner } from '../components/AdBanner';
 
-function HomeScreen() {
+export default function HomeScreen() {
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
   const { isFirstLaunch, loading: pinLoading } = usePin();
@@ -261,4 +261,4 @@ const styles = {
   },
 };
 
-export default HomeScreen;
+

@@ -1,12 +1,7 @@
 import React from 'react';
-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
-import { AdMobConfig } from '../config/admob';
+import { View } from 'react-native';
 
 export const AdBanner = () => {
-  return (
-    <BannerAd
-      unitId={AdMobConfig.bannerAdId}
-      size={BannerAdSize.BANNER}
-    />
-  );
+  // Temporairement désactivé - rebuild natif requis
+  return <View style={{ height: 50, backgroundColor: '#f0f0f0' }} />;
 };

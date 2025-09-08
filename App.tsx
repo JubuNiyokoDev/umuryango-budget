@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { View, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import mobileAds from 'react-native-google-mobile-ads';
+// import mobileAds from 'react-native-google-mobile-ads';
 
 import HomeScreen from './app/home';
 import BudgetScreen from './app/budget';
@@ -22,7 +22,7 @@ export default function App() {
 
   useEffect(() => {
     // Initialise AdMob
-    mobileAds().initialize();
+    // mobileAds().initialize();
     // Masque le splash natif une fois l'app prête
     SplashScreen.hide();
   }, []);

@@ -12,7 +12,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { translateMonth } from '../utils/dateUtils';
 import { AdBanner } from '../components/AdBanner';
 
-function HistoryScreen() {
+export default function HistoryScreen() {
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
   const [selectedMonth, setSelectedMonth] = useState<MonthlyBudget | null>(null);
@@ -377,4 +377,4 @@ const styles = {
   },
 };
 
-export default HistoryScreen;
+

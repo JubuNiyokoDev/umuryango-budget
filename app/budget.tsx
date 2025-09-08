@@ -12,7 +12,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { translateMonth } from '../utils/dateUtils';
 import { AdBanner } from '../components/AdBanner';
 
-function BudgetScreen() {
+export default function BudgetScreen() {
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
   const [showAddContributor, setShowAddContributor] = useState(false);
@@ -371,4 +371,4 @@ const styles = {
   },
 };
 
-export default BudgetScreen;
+
