@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useStyles } from '../styles/commonStyles';
 import { DayBudget } from '../types/budget';
 import { useTranslation } from '../hooks/useTranslation';
+import { useAppState } from '../contexts/AppStateContext';
 import { translateMonth } from '../utils/dateUtils';
 
 interface CalendarProps {
@@ -16,6 +17,9 @@ interface CalendarProps {
 export default function Calendar({ month, year, days, onDayPress }: CalendarProps) {
   const { colors, commonStyles } = useStyles();
   const { t } = useTranslation();
+  const { refreshTrigger } = useAppState();
+  
+  // Le composant se re-render automatiquement grâce à la key dans le parent
 
   const getDaysInMonth = (month: number, year: number) => {
     return new Date(year, month + 1, 0).getDate();

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Modal, RefreshControl } from 'react-native';
 import BottomNavigation from '../components/BottomNavigation';
 import { useBudget } from '../hooks/useBudget';
 import { useStyles } from '../styles/commonStyles';
@@ -10,6 +10,7 @@ import Icon from '../components/Icon';
 import Shimmer from '../components/Shimmer';
 import { useTranslation } from '../hooks/useTranslation';
 import { translateMonth } from '../utils/dateUtils';
+import { AdBanner } from '../components/AdBanner';
 
 function HistoryScreen() {
   const { t } = useTranslation();
@@ -17,7 +18,14 @@ function HistoryScreen() {
   const [selectedMonth, setSelectedMonth] = useState<MonthlyBudget | null>(null);
   const [showMonthDetails, setShowMonthDetails] = useState(false);
 
-  const { budgetHistory, loading } = useBudget();
+  const { budgetHistory, loading, refreshData } = useBudget();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshData();
+    setRefreshing(false);
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR');
@@ -84,7 +92,17 @@ function HistoryScreen() {
       <View style={commonStyles.content}>
         <Text style={[commonStyles.title, { color: colors.text }]}>{t('historyTitle')}</Text>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
+        >
           {budgetHistory.monthlyBudgets.length === 0 ? (
             <View style={[commonStyles.card, commonStyles.center, { backgroundColor: colors.card, minHeight: 200 }]}>
               <Icon name="time-outline" size={48} color={colors.textSecondary} />
@@ -149,6 +167,11 @@ function HistoryScreen() {
                 );
               })
           )}
+          
+          {/* Banner publicitaire */}
+          <View style={{ marginVertical: 10 }}>
+            <AdBanner />
+          </View>
         </ScrollView>
       </View>
 

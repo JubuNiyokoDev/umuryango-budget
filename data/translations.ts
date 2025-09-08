@@ -37,6 +37,9 @@ export const translations = {
     contributorName: 'Nom du contributeur',
     contribution: 'Contribution',
     paid: 'Payé',
+    shouldContribute: 'Doit contribuer',
+    remaining: 'Reste',
+    overpaid: 'Surplus',
 
     // History
     historyTitle: 'Historique',
@@ -314,6 +317,31 @@ export const translations = {
     confirmDeleteItem: 'Êtes-vous sûr de vouloir supprimer cet article?',
     by: 'Par',
     previous: 'Précédent',
+    
+    // Planning Actions
+    planningActions: 'Actions de planification',
+    copyDay: 'Copier la journée',
+    pasteDay: 'Coller la journée',
+    duplicateDay: 'Dupliquer',
+    bulkPlan: 'Planification par lot',
+    copied: 'Copié!',
+    dayOf: 'Journée du',
+    elements: 'éléments',
+    mealCopied: 'Repas copié avec succès',
+    cannotPasteDifferentMealType: 'Vous ne pouvez coller que le même type de repas',
+    replaceContent: 'Remplacer le contenu ?',
+    mealAlreadyHasItems: 'Ce repas contient déjà des éléments. Voulez-vous les remplacer ?',
+    replace: 'Remplacer',
+    duplicateTo: 'Dupliquer vers quels jours ?',
+    planMultipleDays: 'Planifier plusieurs jours',
+    selectAtLeastOneDate: 'Sélectionnez au moins une date',
+    duplicateToSelected: 'Dupliquer vers {count} jour(s) sélectionné(s) ?',
+    planningDuplicatedSuccessfully: 'Planification dupliquée avec succès',
+    planningAppliedToMultipleDays: 'Planification appliquée à {count} jour(s)',
+    clipboardInfo: 'Copié: {info}',
+    morningMeal: 'Matin',
+    noonMeal: 'Midi', 
+    eveningMeal: 'Soir',
 
     // Meal times
     breakfast: 'Petit-déjeuner',
@@ -466,6 +494,9 @@ export const translations = {
     contributorName: "Izina ry'uwugabura",
     contribution: 'Uruhare',
     paid: 'Yaratanzeko',
+    shouldContribute: 'Agomba gutanga',
+    remaining: 'Asigaye',
+    overpaid: 'Yarenze',
 
     // History
     historyTitle: 'Amateka',
@@ -693,6 +724,31 @@ export const translations = {
     deleteItem: 'Siba ikintu',
     confirmDeleteItem: 'Uremeza gusiba iki kintu?',
     by: 'Na',
+    
+    // Planning Actions
+    planningActions: 'Ibikorwa vyo gutegura',
+    copyDay: 'Koporora umusi',
+    pasteDay: 'Shira umusi',
+    duplicateDay: 'Gusubiramo',
+    bulkPlan: 'Gutegura byinshi',
+    copied: 'Vyakoporoye!',
+    dayOf: 'Umusi wa',
+    elements: 'ibintu',
+    mealCopied: 'Ifunguro ryakoporoye neza',
+    cannotPasteDifferentMealType: 'Ushobora gushira ubwoko bumwe bw\'ifunguro gusa',
+    replaceContent: 'Gusimbura ibiri ?',
+    mealAlreadyHasItems: 'Iri funguro rifise ibintu. Urashaka kubisimbura ?',
+    replace: 'Simbura',
+    duplicateTo: 'Gusubiramo ku minsi ihe ?',
+    planMultipleDays: 'Gutegura iminsi myinshi',
+    selectAtLeastOneDate: 'Hitamo nibura itariki imwe',
+    duplicateToSelected: 'Gusubiramo ku minsi {count} wahisemo ?',
+    planningDuplicatedSuccessfully: 'Imiteguro yasubiramwo neza',
+    planningAppliedToMultipleDays: 'Imiteguro yakoreshejwe ku minsi {count}',
+    clipboardInfo: 'Vyakoporoye: {info}',
+    morningMeal: 'Bukeye',
+    noonMeal: 'Saa sita',
+    eveningMeal: 'Nimugoroba',
   },
 };
 

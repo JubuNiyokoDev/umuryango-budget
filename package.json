@@ -48,11 +48,13 @@
     "react-native-device-info": "^14.0.4",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-google-mobile-ads": "^15.7.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-toast-message": "^2.3.3",
+    "react-native-unity-ads": "^1.0.3",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "^0.20.0"
   },

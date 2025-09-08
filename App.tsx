@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { View, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import SplashScreen from 'react-native-splash-screen';
+import mobileAds from 'react-native-google-mobile-ads';
 
 import HomeScreen from './app/home';
 import BudgetScreen from './app/budget';
@@ -11,6 +11,8 @@ import SettingsScreen from './app/settings';
 import DayDetailsScreen from './app/day-details-simple';
 import BottomNavigation from './components/BottomNavigation';
 import UpdateManager from './UpdateManager';
+import { PlanningClipboardProvider } from './contexts/PlanningClipboardContext';
+import { SplashScreen } from 'expo-router';
 
 type Screen = 'home' | 'budget' | 'history' | 'settings' | 'day-details';
 
@@ -19,6 +21,8 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
+    // Initialise AdMob
+    mobileAds().initialize();
     // Masque le splash natif une fois l'app prête
     SplashScreen.hide();
   }, []);
@@ -45,24 +49,23 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    // Masque le splash natif une fois l'app prête
-    SplashScreen.hide();
-  }, []);
+
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <View style={{ flex: 1 }}>
-        {renderScreen()}
-        {currentScreen !== 'day-details' && (
-          <BottomNavigation
-            currentTab={currentScreen}
-            onTabPress={tab => setCurrentScreen(tab as Screen)}
-          />
-        )}
-        <UpdateManager />
-      </View>
+      <PlanningClipboardProvider>
+        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+        <View style={{ flex: 1 }}>
+          {renderScreen()}
+          {currentScreen !== 'day-details' && (
+            <BottomNavigation
+              currentTab={currentScreen}
+              onTabPress={tab => setCurrentScreen(tab as Screen)}
+            />
+          )}
+          <UpdateManager />
+        </View>
+      </PlanningClipboardProvider>
     </SafeAreaProvider>
   );
 }

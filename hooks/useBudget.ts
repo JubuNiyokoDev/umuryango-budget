@@ -16,8 +16,26 @@ export const useBudget = () => {
     loadBudgetData();
   }, []);
 
+  // Charger le mois courant seulement si aucun mois n'est sélectionné et qu'on n'est pas en train de naviguer
+  useEffect(() => {
+    if (!loading && !selectedMonth) {
+      // Attendre un peu pour voir si un composant va définir un mois spécifique
+      const timer = setTimeout(() => {
+        if (!selectedMonth) {
+          const currentMonth = getCurrentMonth();
+          console.log('No month selected after delay, setting to current:', currentMonth);
+          setSelectedMonth(currentMonth);
+        }
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [loading, selectedMonth]);
+
   useEffect(() => {
     if (selectedMonth) {
+      console.log('Selected month changed to:', selectedMonth);
+      // Toujours charger le mois sélectionné
       loadMonthBudget(selectedMonth.month, selectedMonth.year);
     }
   }, [selectedMonth]);
@@ -33,18 +51,15 @@ export const useBudget = () => {
 
   const loadBudgetData = async () => {
     try {
-      // Load current month budget
-      const currentMonth = getCurrentMonth();
-      setSelectedMonth(currentMonth);
-      
-      // Load history
+      // Load history first
       const historyData = await AsyncStorage.getItem(HISTORY_KEY);
       if (historyData) {
         const parsedHistory = JSON.parse(historyData);
         setBudgetHistory(parsedHistory);
       }
       
-      await loadMonthBudget(currentMonth.month, currentMonth.year);
+      // Ne pas charger automatiquement le mois courant
+      // Laisser les composants décider quel mois charger
     } catch (error) {
       console.error('Error loading budget data:', error);
     } finally {
@@ -60,6 +75,7 @@ export const useBudget = () => {
       if (data) {
         const parsedData = JSON.parse(data);
         setCurrentMonthBudget(parsedData);
+        console.log(`Loaded month budget for ${monthId}:`, parsedData.days.length, 'days');
       } else {
         // Create new month budget
         const newBudget: MonthlyBudget = {
@@ -77,6 +93,7 @@ export const useBudget = () => {
         };
         setCurrentMonthBudget(newBudget);
         await saveMonthBudget(newBudget);
+        console.log(`Created new month budget for ${monthId}`);
       }
     } catch (error) {
       console.error('Error loading month budget:', error);
@@ -148,6 +165,16 @@ export const useBudget = () => {
   const getDayBudget = (date: string): DayBudget | null => {
     if (!currentMonthBudget) {
       console.log('No currentMonthBudget available');
+      // Essayer de charger le mois correspondant à la date
+      const dateObj = new Date(date);
+      const month = dateObj.getMonth();
+      const year = dateObj.getFullYear();
+      
+      // Si ce n'est pas le mois sélectionné, on ne peut pas accéder aux données
+      if (!selectedMonth || selectedMonth.month !== month || selectedMonth.year !== year) {
+        console.log(`Date ${date} is not in selected month`);
+        return null;
+      }
       return null;
     }
     const dayBudget = currentMonthBudget.days.find(day => day.date === date) || null;
@@ -306,8 +333,8 @@ export const useBudget = () => {
       id: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
       name,
       totalContribution: contribution,
-      paidAmount: 0,
-      remainingAmount: contribution,
+      paidAmount: contribution, // Le montant saisi est ce qui a été payé
+      remainingAmount: 0, // Pas de reste puisque c'est ce qui a été payé
     };
 
     const updatedBudget = {
@@ -379,6 +406,189 @@ export const useBudget = () => {
   const refreshData = async () => {
     setLoading(true);
     await loadBudgetData();
+    // Forcer le rechargement du mois sélectionné
+    if (selectedMonth) {
+      await loadMonthBudget(selectedMonth.month, selectedMonth.year);
+    }
+  };
+
+  const forceRefreshCurrentMonth = async () => {
+    if (selectedMonth) {
+      await loadMonthBudget(selectedMonth.month, selectedMonth.year);
+    }
+  };
+
+  const replaceMealItems = async (date: string, mealType: 'morning' | 'noon' | 'evening', items: MealItem[]) => {
+    // Pour la duplication, on vérifie seulement si la date cible est éditable
+    const targetDateCheck = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    targetDateCheck.setHours(0, 0, 0, 0);
+    
+    if (targetDateCheck < today) {
+      console.log('Cannot edit past day:', date);
+      return;
+    }
+
+    // Attendre que currentMonthBudget soit disponible
+    let retries = 0;
+    while (!currentMonthBudget && retries < 10) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      retries++;
+    }
+
+    let dayBudget = getDayBudget(date);
+    
+    if (!dayBudget) {
+      dayBudget = {
+        id: date,
+        date,
+        meals: [
+          createEmptyMeal('morning'),
+          createEmptyMeal('noon'),
+          createEmptyMeal('evening'),
+        ],
+        total: 0,
+        status: 'pending',
+        validated: false,
+      };
+    }
+
+    // S'assurer que tous les types de repas existent
+    const allMealTypes: ('morning' | 'noon' | 'evening')[] = ['morning', 'noon', 'evening'];
+    const updatedMeals = allMealTypes.map(type => {
+      const existingMeal = dayBudget!.meals.find(m => m.type === type);
+      if (type === mealType) {
+        // Remplacer seulement le repas ciblé
+        const newItems = items.map(item => ({
+          ...item,
+          id: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        }));
+        return {
+          id: `${Date.now()}-${type}`,
+          type,
+          items: newItems,
+          total: newItems.reduce((sum, item) => sum + item.price, 0),
+        };
+      } else {
+        // Garder les autres repas intacts
+        return existingMeal || createEmptyMeal(type);
+      }
+    });
+
+    const updatedDayBudget = {
+      ...dayBudget,
+      meals: updatedMeals,
+      total: updatedMeals.reduce((sum, meal) => sum + meal.total, 0),
+      status: updatedMeals.some(meal => meal.items.length > 0) ? 'planned' as const : 'pending' as const,
+    };
+
+    await updateDayBudget(updatedDayBudget);
+  };
+
+  const getMonthDates = (): string[] => {
+    if (!selectedMonth) return [];
+    
+    const dates: string[] = [];
+    const year = selectedMonth.year;
+    const month = selectedMonth.month;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      dates.push(date.toISOString().split('T')[0]);
+    }
+    
+    return dates;
+  };
+
+  const getEditableDates = (): string[] => {
+    const allDates = getMonthDates();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return allDates.filter(dateString => {
+      const date = new Date(dateString);
+      date.setHours(0, 0, 0, 0);
+      return date >= today;
+    });
+  };
+
+  const duplicateFullDay = async (targetDate: string, meals: Meal[]) => {
+    // Vérifier si on doit changer de mois
+    const targetDateObj = new Date(targetDate);
+    const targetMonth = targetDateObj.getMonth();
+    const targetYear = targetDateObj.getFullYear();
+    
+    if (!selectedMonth || selectedMonth.month !== targetMonth || selectedMonth.year !== targetYear) {
+      console.log(`Switching to month ${targetMonth}/${targetYear} for date ${targetDate}`);
+      selectMonth(targetMonth, targetYear);
+      // Attendre que le nouveau mois soit chargé
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Attendre que currentMonthBudget soit disponible
+    let retries = 0;
+    while (!currentMonthBudget && retries < 20) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      retries++;
+    }
+
+    const targetDateCheck2 = new Date(targetDate);
+    const today2 = new Date();
+    today2.setHours(0, 0, 0, 0);
+    targetDateCheck2.setHours(0, 0, 0, 0);
+    
+    if (targetDateCheck2 < today2) {
+      console.log('Cannot edit past day:', targetDate);
+      return;
+    }
+
+    let dayBudget = getDayBudget(targetDate);
+    
+    if (!dayBudget) {
+      dayBudget = {
+        id: targetDate,
+        date: targetDate,
+        meals: [
+          createEmptyMeal('morning'),
+          createEmptyMeal('noon'),
+          createEmptyMeal('evening'),
+        ],
+        total: 0,
+        status: 'pending',
+        validated: false,
+      };
+    }
+
+    // Dupliquer tous les repas en une seule fois
+    const allMealTypes: ('morning' | 'noon' | 'evening')[] = ['morning', 'noon', 'evening'];
+    const updatedMeals = allMealTypes.map(type => {
+      const sourceMeal = meals.find(m => m.type === type);
+      if (sourceMeal && sourceMeal.items.length > 0) {
+        const newItems = sourceMeal.items.map(item => ({
+          ...item,
+          id: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        }));
+        return {
+          id: `${Date.now()}-${type}`,
+          type,
+          items: newItems,
+          total: newItems.reduce((sum, item) => sum + item.price, 0),
+        };
+      } else {
+        return createEmptyMeal(type);
+      }
+    });
+
+    const updatedDayBudget = {
+      ...dayBudget,
+      meals: updatedMeals,
+      total: updatedMeals.reduce((sum, meal) => sum + meal.total, 0),
+      status: updatedMeals.some(meal => meal.items.length > 0) ? 'planned' as const : 'pending' as const,
+    };
+
+    await updateDayBudget(updatedDayBudget);
   };
 
   return {
@@ -392,6 +602,11 @@ export const useBudget = () => {
     canEditDay,
     addMealItem,
     removeMealItem,
+    replaceMealItems,
+    getMonthDates,
+    getEditableDates,
+    duplicateFullDay,
+    forceRefreshCurrentMonth,
     addContributor,
     updateContributor,
     selectMonth,

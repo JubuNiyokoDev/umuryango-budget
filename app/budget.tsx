@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, Modal, RefreshControl } from 'react-native';
 import BottomNavigation from '../components/BottomNavigation';
 import { useStyles } from '../styles/commonStyles';
 import { useBudget } from '../hooks/useBudget';
@@ -10,6 +10,7 @@ import LoadingButton from '../components/LoadingButton';
 import Shimmer from '../components/Shimmer';
 import { useTranslation } from '../hooks/useTranslation';
 import { translateMonth } from '../utils/dateUtils';
+import { AdBanner } from '../components/AdBanner';
 
 function BudgetScreen() {
   const { t } = useTranslation();
@@ -26,7 +27,16 @@ function BudgetScreen() {
     addContributor,
     updateContributor,
     loading: budgetLoading,
+    refreshData,
   } = useBudget();
+  
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshData();
+    setRefreshing(false);
+  };
 
   const handleAddContributor = async () => {
     if (!currentMonthBudget || currentMonthBudget.totalBudget === 0) {
@@ -120,7 +130,17 @@ function BudgetScreen() {
       <View style={commonStyles.content}>
         <Text style={[commonStyles.title, { color: colors.text }]}>{t('monthlyBudget')}</Text>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
+        >
           {/* Budget Overview */}
           <View style={[commonStyles.card, { backgroundColor: colors.card }]}>
             <Text style={[commonStyles.subtitle, { color: colors.text }]}>
@@ -187,17 +207,14 @@ function BudgetScreen() {
                 <View style={styles.contributorInfo}>
                   <Text style={[styles.contributorName, { color: colors.text }]}>{contributor.name}</Text>
                   <Text style={[styles.contributorAmount, { color: colors.textSecondary }]}>
-                    Contribution: {contributor.totalContribution.toLocaleString()} {t('currency')}
+                    {t('contribution')}: {contributor.totalContribution.toLocaleString()} {t('currency')}
                   </Text>
                 </View>
                 
                 <View style={styles.contributorActions}>
                   <View style={styles.paymentInfo}>
-                    <Text style={[styles.paidAmount, { color: colors.success }]}>
-                      {contributor.paidAmount.toLocaleString()} {t('currency')}
-                    </Text>
-                    <Text style={[styles.remainingAmount, { color: colors.error }]}>
-                      Reste: {contributor.remainingAmount.toLocaleString()} {t('currency')}
+                    <Text style={[styles.paidAmount, { color: colors.primary }]}>
+                      {t('paid')}: {contributor.paidAmount.toLocaleString()} {t('currency')}
                     </Text>
                   </View>
                   
@@ -216,6 +233,11 @@ function BudgetScreen() {
                 {t('noContributorsAdded')}
               </Text>
             )}
+          </View>
+          
+          {/* Banner publicitaire */}
+          <View style={{ marginVertical: 10 }}>
+            <AdBanner />
           </View>
         </ScrollView>
       </View>
@@ -241,7 +263,7 @@ function BudgetScreen() {
             
             <TextInput
               style={[commonStyles.input, { marginTop: 12, backgroundColor: colors.backgroundAlt, borderColor: colors.border, color: colors.text }]}
-              placeholder={`${t('contribution')} (${t('currency')})`}
+              placeholder={`${t('paid')} (${t('currency')})`}
               placeholderTextColor={colors.textSecondary}
               value={contributorAmount}
               onChangeText={setContributorAmount}
@@ -316,11 +338,8 @@ const styles = {
     alignItems: 'flex-end' as const,
   },
   paidAmount: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600' as const,
-  },
-  remainingAmount: {
-    fontSize: 10,
   },
   updateButton: {
     padding: 8,

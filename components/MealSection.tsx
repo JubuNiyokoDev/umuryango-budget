@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, TextInput, Alert, StyleSheet, Animated } from 'react-native';
 import { useStyles } from '../styles/commonStyles';
 import { useTranslation } from '../hooks/useTranslation';
+import { usePlanningClipboard } from '../contexts/PlanningClipboardContext';
 import Icon from './Icon';
 import LoadingButton from './LoadingButton';
 import { Meal, MealItem } from '../types/budget';
@@ -13,8 +14,10 @@ interface MealSectionProps {
   icon: string;
   onAddItem: (item: Omit<MealItem, 'id'>) => void;
   onRemoveItem: (itemId: string) => void;
+  onPasteMeal?: (meal: Meal) => void;
   currency: string;
   disabled?: boolean;
+  currentDate?: string;
 }
 
 export default function MealSection({
@@ -23,14 +26,19 @@ export default function MealSection({
   icon,
   onAddItem,
   onRemoveItem,
+  onPasteMeal,
   currency,
-  disabled = false
+  disabled = false,
+  currentDate
 }: MealSectionProps) {
   const { colors, commonStyles } = useStyles();
   const { t } = useTranslation();
+  const { copyMeal, pasteData, hasCopiedData, getCopiedInfo } = usePlanningClipboard();
   const [showAddForm, setShowAddForm] = useState(false);
   const [itemName, setItemName] = useState('');
   const [itemPrice, setItemPrice] = useState('');
+  const [copyAnimation] = useState(new Animated.Value(1));
+  const [justCopied, setJustCopied] = useState(false);
 
   const handleAddItem = async () => {
     if (!itemName.trim() || !itemPrice.trim()) {
@@ -69,6 +77,71 @@ export default function MealSection({
     );
   };
 
+  const handleCopyMeal = () => {
+    if (!currentDate) return;
+    
+    copyMeal(currentDate, meal);
+    setJustCopied(true);
+    
+    // Animation de feedback
+    Animated.sequence([
+      Animated.timing(copyAnimation, {
+        toValue: 1.2,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(copyAnimation, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      })
+    ]).start();
+    
+    // Reset après 2 secondes
+    setTimeout(() => setJustCopied(false), 2000);
+  };
+
+  const handlePasteMeal = () => {
+    const clipboardData = pasteData();
+    if (!clipboardData || clipboardData.type !== 'meal' || !onPasteMeal) return;
+    
+    const mealToPaste = clipboardData.data as Meal;
+    if (mealToPaste.type !== meal.type) {
+      Alert.alert(t('error'), t('cannotPasteDifferentMealType'));
+      return;
+    }
+    
+    if (meal.items.length > 0) {
+      Alert.alert(
+        t('replaceContent'),
+        t('mealAlreadyHasItems'),
+        [
+          { text: t('cancel'), style: 'cancel' },
+          {
+            text: t('replace'),
+            style: 'destructive',
+            onPress: () => onPasteMeal(mealToPaste),
+          },
+        ]
+      );
+    } else {
+      onPasteMeal(mealToPaste);
+    }
+  };
+
+  const canPaste = () => {
+    const clipboardData = pasteData();
+    if (!clipboardData || clipboardData.type !== 'meal') return false;
+    
+    const copiedMeal = clipboardData.data as Meal;
+    
+    // Permettre le collage si :
+    // 1. C'est le même type de repas d'un autre jour
+    // 2. OU c'est un type différent du même jour (matin -> midi, midi -> soir, etc.)
+    return (copiedMeal.type === meal.type && clipboardData.date !== currentDate) ||
+           (copiedMeal.type !== meal.type && clipboardData.date === currentDate);
+  };
+
   return (
     <View style={[commonStyles.card, { backgroundColor: colors.card }]}>
       <View style={[commonStyles.row, { marginBottom: 16 }]}>
@@ -83,17 +156,51 @@ export default function MealSection({
           <Text style={[styles.totalText, { color: colors.primary }]}>
             {meal.total.toLocaleString()} {currency}
           </Text>
+          
           {!disabled && (
-            <TouchableOpacity
-              onPress={() => setShowAddForm(!showAddForm)}
-              style={{ opacity: disabled ? 0.5 : 1 }}
-            >
-              <Icon 
-                name={showAddForm ? "remove-circle" : "add-circle"} 
-                size={20} 
-                color={colors.primary} 
-              />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              {/* Bouton Coller */}
+              {canPaste() && (
+                <TouchableOpacity
+                  onPress={handlePasteMeal}
+                  style={[styles.actionButton, { backgroundColor: colors.success + '20' }]}
+                >
+                  <Icon name="clipboard" size={16} color={colors.success} />
+                </TouchableOpacity>
+              )}
+              
+              {/* Bouton Copier avec animation */}
+              {meal.items.length > 0 && (
+                <Animated.View style={{ transform: [{ scale: copyAnimation }] }}>
+                  <TouchableOpacity
+                    onPress={handleCopyMeal}
+                    style={[
+                      styles.actionButton, 
+                      { 
+                        backgroundColor: justCopied ? colors.success + '20' : colors.primary + '20'
+                      }
+                    ]}
+                  >
+                    <Icon 
+                      name={justCopied ? "checkmark" : "copy"} 
+                      size={16} 
+                      color={justCopied ? colors.success : colors.primary} 
+                    />
+                  </TouchableOpacity>
+                </Animated.View>
+              )}
+              
+              {/* Bouton Ajouter */}
+              <TouchableOpacity
+                onPress={() => setShowAddForm(!showAddForm)}
+              >
+                <Icon 
+                  name={showAddForm ? "remove-circle" : "add-circle"} 
+                  size={20} 
+                  color={colors.primary} 
+                />
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       </View>
@@ -180,6 +287,10 @@ const styles = StyleSheet.create({
   totalText: {
     fontSize: 16,
     fontWeight: '700',
+  },
+  actionButton: {
+    padding: 6,
+    borderRadius: 6,
   },
   itemRow: {
     flexDirection: 'row',

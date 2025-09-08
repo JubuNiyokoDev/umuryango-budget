@@ -1,36 +1,60 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useStyles } from '../styles/commonStyles';
 import { useTranslation } from '../hooks/useTranslation';
 import { useBudget } from '../hooks/useBudget';
+import { useAppState } from '../contexts/AppStateContext';
 import { DayBudget, Meal } from '../types/budget';
 import MealSection from '../components/MealSection';
+import PlanningActions from '../components/PlanningActions';
 import LoadingButton from '../components/LoadingButton';
 import Icon from '../components/Icon';
+import { AdBanner } from '../components/AdBanner';
+import { useInterstitialAd } from '../hooks/useInterstitialAd';
 
 export default function DayDetailsScreen() {
   const { date } = useLocalSearchParams<{ date: string }>();
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
+  const { budgetUpdated } = useAppState();
+  const { showAd } = useInterstitialAd();
   const { 
     getDayBudget, 
     addMealItem, 
     removeMealItem, 
     validateDay, 
     canEditDay,
-    currentMonthBudget
+    currentMonthBudget,
+    replaceMealItems,
+    getMonthDates,
+    getEditableDates,
+    duplicateFullDay,
+    forceRefreshCurrentMonth,
+    selectedMonth,
+    selectMonth,
+    refreshData
   } = useBudget();
   
   const [dayBudget, setDayBudget] = useState<DayBudget | null>(null);
   const [isEditable, setIsEditable] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isLoadingDay, setIsLoadingDay] = useState(true);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshData();
+    await loadDayBudget();
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     if (date) {
       loadDayBudget();
     }
-  }, [date, currentMonthBudget]); // Reload when currentMonthBudget changes
+  }, [date]); // Only reload when date changes
 
   // Force reload when screen comes into focus
   useFocusEffect(
@@ -42,27 +66,64 @@ export default function DayDetailsScreen() {
     }, [date])
   );
 
-  const loadDayBudget = () => {
+  const loadDayBudget = async () => {
     if (!date) return;
     
+    setIsLoadingDay(true);
+    
+    // Vérifier si on doit changer de mois
+    const dateObj = new Date(date);
+    const month = dateObj.getMonth();
+    const year = dateObj.getFullYear();
+    
+    // Forcer le changement de mois si nécessaire
+    if (!selectedMonth || selectedMonth.month !== month || selectedMonth.year !== year) {
+      console.log(`Forcing month switch to ${month}/${year} for date ${date}`);
+      
+      // Charger directement le mois sans passer par selectedMonth
+      const monthId = `${year}-${month + 1}`;
+      try {
+        const data = await AsyncStorage.getItem(`@budget_data_${monthId}`);
+        if (data) {
+          const parsedData = JSON.parse(data);
+          console.log(`Direct load of month ${monthId}:`, parsedData.days.length, 'days');
+          
+          // Mettre à jour directement currentMonthBudget
+          const budget = getDayBudget(date);
+          if (parsedData.days.find((d: any) => d.date === date)) {
+            console.log('Found day in direct loaded month');
+            setDayBudget(parsedData.days.find((d: any) => d.date === date));
+            setIsEditable(canEditDay(date));
+            setIsLoadingDay(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error direct loading month:', error);
+      }
+      
+      // Si échec du chargement direct, utiliser la méthode normale
+      selectMonth(month, year);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Attendre que currentMonthBudget soit disponible pour le bon mois
+    let retries = 0;
+    while (retries < 10) {
+      if (currentMonthBudget && currentMonthBudget.monthNumber === month && currentMonthBudget.year === year) {
+        break;
+      }
+      await new Promise(resolve => setTimeout(resolve, 200));
+      retries++;
+    }
+    
+    // Charger les données du jour
     const budget = getDayBudget(date);
     setDayBudget(budget);
     setIsEditable(canEditDay(date));
     console.log('Loaded day budget:', budget);
     console.log('Is editable:', canEditDay(date));
-    
-    // If no budget found but we should have data, force refresh
-    if (!budget) {
-      console.log('No budget found, checking if data exists...');
-      // Small delay to ensure data is loaded
-      setTimeout(() => {
-        const retryBudget = getDayBudget(date);
-        if (retryBudget) {
-          console.log('Found budget on retry:', retryBudget);
-          setDayBudget(retryBudget);
-        }
-      }, 100);
-    }
+    setIsLoadingDay(false);
   };
 
   const handleAddItem = async (mealType: 'morning' | 'noon' | 'evening', item: { name: string; price: number }) => {
@@ -74,6 +135,9 @@ export default function DayDetailsScreen() {
     console.log('Adding item:', { mealType, item });
     await addMealItem(date, mealType, item);
     loadDayBudget(); // Refresh the data
+    
+    // Immediate refresh
+    budgetUpdated(); // Trigger global refresh
   };
 
   const handleRemoveItem = async (mealType: 'morning' | 'noon' | 'evening', itemId: string) => {
@@ -85,6 +149,48 @@ export default function DayDetailsScreen() {
     console.log('Removing item:', { mealType, itemId });
     await removeMealItem(date, mealType, itemId);
     loadDayBudget(); // Refresh the data
+    
+    // Immediate refresh
+    budgetUpdated(); // Trigger global refresh
+  };
+
+  const handlePasteMeal = async (mealType: 'morning' | 'noon' | 'evening', mealToPaste: Meal) => {
+    if (!date || !isEditable) {
+      Alert.alert(t('error'), t('cannotEditValidatedDay'));
+      return;
+    }
+
+    // Remplacer tous les items du repas
+    await replaceMealItems(date, mealType, mealToPaste.items);
+    loadDayBudget();
+    Alert.alert(t('success'), t('mealCopied'));
+    
+    // Immediate refresh
+    budgetUpdated(); // Trigger global refresh
+  };
+
+  const handleDuplicateToDate = async (targetDate: string, meals: Meal[]) => {
+    console.log('Duplicating to date:', targetDate, 'meals:', meals);
+    await duplicateFullDay(targetDate, meals);
+    await forceRefreshCurrentMonth();
+    loadDayBudget(); // Refresh current day if needed
+    
+    // Immediate refresh
+    budgetUpdated(); // Trigger global refresh
+  };
+
+  const handleBulkPlan = async (dates: string[], meals: Meal[]) => {
+    console.log('Bulk planning for dates:', dates, 'meals:', meals);
+    
+    for (const targetDate of dates) {
+      await duplicateFullDay(targetDate, meals);
+    }
+    
+    await forceRefreshCurrentMonth();
+    loadDayBudget(); // Refresh current day if needed
+    
+    // Immediate refresh
+    budgetUpdated(); // Trigger global refresh
   };
 
   const handleValidateDay = async () => {
@@ -94,6 +200,8 @@ export default function DayDetailsScreen() {
       Alert.alert(t('information'), t('dayAlreadyValidated'));
       return;
     }
+    
+    showAd(); // Pub avant validation
 
     if (dayBudget.total === 0) {
       Alert.alert(t('warning'), t('noMealsPlannedValidateAnyway'), [
@@ -102,6 +210,7 @@ export default function DayDetailsScreen() {
           text: t('confirm'),
           onPress: async () => {
             await validateDay(date);
+            budgetUpdated(); // Trigger global refresh
             Alert.alert(t('success'), t('dayValidatedSuccessfully'));
             setTimeout(() => {
               loadDayBudget();
@@ -122,6 +231,7 @@ export default function DayDetailsScreen() {
           onPress: async () => {
             console.log('Validating day:', date);
             await validateDay(date);
+            budgetUpdated(); // Trigger global refresh
             Alert.alert(t('success'), t('dayValidatedSuccessfully'));
             setTimeout(() => {
               loadDayBudget();
@@ -219,7 +329,17 @@ export default function DayDetailsScreen() {
           <View style={{ width: 24 }} />
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
+        >
           {/* Date and Status */}
           <View style={[commonStyles.card, { backgroundColor: colors.card }]}>
             <Text style={[commonStyles.subtitle, { color: colors.text }]}>
@@ -251,8 +371,8 @@ export default function DayDetailsScreen() {
             )}
           </View>
 
-          {/* Empty past day message */}
-          {isPast() && (!dayBudget || dayBudget.total === 0) && (
+          {/* Empty past day message - seulement si vraiment aucune donnée ET pas en cours de chargement */}
+          {!isLoadingDay && isPast() && (!dayBudget || (dayBudget.total === 0 && !dayBudget.meals.some(meal => meal.items.length > 0))) && (
             <View style={[commonStyles.card, { backgroundColor: colors.card }]}>
               <View style={[commonStyles.center, { padding: 20 }]}>
                 <Icon name="calendar-outline" size={48} color={colors.textSecondary} />
@@ -266,8 +386,8 @@ export default function DayDetailsScreen() {
             </View>
           )}
 
-          {/* Meals - only show if day has data or is editable */}
-          {(dayBudget || isEditable) && (
+          {/* Meals - show if day has data OR is editable OR still loading */}
+          {(isLoadingDay || (dayBudget && (dayBudget.total > 0 || dayBudget.meals.some(meal => meal.items.length > 0))) || isEditable) && (
             <>
               <MealSection
                 meal={getMealByType('morning')}
@@ -275,8 +395,10 @@ export default function DayDetailsScreen() {
                 icon="sunny"
                 onAddItem={(item) => handleAddItem('morning', item)}
                 onRemoveItem={(itemId) => handleRemoveItem('morning', itemId)}
+                onPasteMeal={(meal) => handlePasteMeal('morning', meal)}
                 currency={t('currency')}
                 disabled={!isEditable}
+                currentDate={date}
               />
 
               <MealSection
@@ -285,8 +407,10 @@ export default function DayDetailsScreen() {
                 icon="sunny-outline"
                 onAddItem={(item) => handleAddItem('noon', item)}
                 onRemoveItem={(itemId) => handleRemoveItem('noon', itemId)}
+                onPasteMeal={(meal) => handlePasteMeal('noon', meal)}
                 currency={t('currency')}
                 disabled={!isEditable}
+                currentDate={date}
               />
 
               <MealSection
@@ -295,14 +419,26 @@ export default function DayDetailsScreen() {
                 icon="moon"
                 onAddItem={(item) => handleAddItem('evening', item)}
                 onRemoveItem={(itemId) => handleRemoveItem('evening', itemId)}
+                onPasteMeal={(meal) => handlePasteMeal('evening', meal)}
                 currency={t('currency')}
+                disabled={!isEditable}
+                currentDate={date}
+              />
+
+              {/* Actions de planification */}
+              <PlanningActions
+                currentDate={date}
+                dayMeals={dayBudget?.meals || []}
+                onDuplicateToDate={handleDuplicateToDate}
+                onBulkPlan={handleBulkPlan}
+                availableDates={getEditableDates()}
                 disabled={!isEditable}
               />
             </>
           )}
 
-          {/* Total and Actions - only show if day has data or is editable */}
-          {(dayBudget || isEditable) && (
+          {/* Total and Actions - show if day has data OR is editable */}
+          {((dayBudget && (dayBudget.total > 0 || dayBudget.meals.some(meal => meal.items.length > 0))) || isEditable) && (
             <View style={[commonStyles.card, { backgroundColor: colors.card }]}>
               <View style={commonStyles.row}>
                 <Text style={[commonStyles.subtitle, { color: colors.primary }]}>
@@ -353,6 +489,11 @@ export default function DayDetailsScreen() {
             )}
             </View>
           )}
+          
+          {/* Banner publicitaire */}
+          <View style={{ marginVertical: 10 }}>
+            <AdBanner />
+          </View>
         </ScrollView>
       </View>
     </View>

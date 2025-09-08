@@ -15,6 +15,10 @@
     android:theme="@style/AppTheme" 
     android:supportsRtl="true">
     
+    <meta-data
+      android:name="com.google.android.gms.ads.APPLICATION_ID"
+      android:value="ca-app-pub-2300546388710165~1923776861"/>
+    
     <activity 
       android:name=".MainActivity" 
       android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode" 

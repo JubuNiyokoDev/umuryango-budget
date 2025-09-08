@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useStyles } from '../styles/commonStyles';
@@ -13,12 +13,21 @@ import LoadingButton from '../components/LoadingButton';
 import PinModal from '../components/PinModal';
 import DataDeletionModal from '../components/DataDeletionModal';
 import { useImportExport } from '../hooks/useImportExport';
+import { AdBanner } from '../components/AdBanner';
+import { useInterstitialAd } from '../hooks/useInterstitialAd';
 
 export default function SettingsScreen() {
   const { language, changeLanguage, t } = useTranslation();
   const { themeMode, changeTheme } = useTheme();
   const { hasPin, setPin, verifyPin, removePin } = usePin();
   const { budgetHistory, refreshData } = useBudget();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshData();
+    setRefreshing(false);
+  };
   const {
     exportLoading,
     importLoading,
@@ -28,6 +37,7 @@ export default function SettingsScreen() {
   } = useImportExport();
   const { colors, commonStyles } = useStyles();
   const forceUpdate = useForceUpdate();
+  const { showAd } = useInterstitialAd();
 
   const [pinModalVisible, setPinModalVisible] = useState(false);
   const [pinModalMode, setPinModalMode] = useState<'create' | 'verify'>(
@@ -198,6 +208,7 @@ export default function SettingsScreen() {
   };
 
   const handleExportData = async () => {
+    showAd(); // Affiche la pub avant l'export
     Alert.alert(
       t('exportData'),
       t('exportDataDescription'),
@@ -284,7 +295,17 @@ export default function SettingsScreen() {
           <View style={{ width: 24 }} />
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
+        >
           {/* Language Settings */}
           <View style={[commonStyles.card, { backgroundColor: colors.card }]}>
             <Text style={[commonStyles.subtitle, { color: colors.text }]}>
@@ -623,6 +644,11 @@ export default function SettingsScreen() {
                 {t('pinProtection')}
               </Text>
             </View>
+          </View>
+          
+          {/* Banner publicitaire */}
+          <View style={{ marginVertical: 10 }}>
+            <AdBanner />
           </View>
         </ScrollView>
       </View>

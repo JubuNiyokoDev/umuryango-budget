@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Modal, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import BottomNavigation from '../components/BottomNavigation';
 import PinSetupScreen from '../components/PinSetupScreen';
@@ -11,12 +11,15 @@ import Icon from '../components/Icon';
 import MonthSelector from '../components/MonthSelector';
 import Shimmer from '../components/Shimmer';
 import { useTranslation } from '../hooks/useTranslation';
+import { useAppState } from '../contexts/AppStateContext';
 import { translateMonth } from '../utils/dateUtils';
+import { AdBanner } from '../components/AdBanner';
 
 function HomeScreen() {
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
   const { isFirstLaunch, loading: pinLoading } = usePin();
+  const { refreshTrigger } = useAppState();
   const [showMonthSelector, setShowMonthSelector] = useState(false);
   const [pinSetupComplete, setPinSetupComplete] = useState(false);
 
@@ -26,7 +29,28 @@ function HomeScreen() {
     selectMonth,
     getAvailableMonths,
     loading,
+    refreshData,
   } = useBudget();
+  
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshData();
+    setRefreshing(false);
+  };
+
+  // Auto-refresh quand refreshTrigger change (avec debounce)
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      console.log('Auto-refreshing home screen due to data change');
+      const timer = setTimeout(() => {
+        refreshData();
+      }, 50); // Debounce de 50ms pour réactivité immédiate
+      
+      return () => clearTimeout(timer);
+    }
+  }, [refreshTrigger]);
 
   const handleDayPress = (date: string) => {
     router.push(`/day-details?date=${date}`);
@@ -84,7 +108,17 @@ function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
+        >
           {/* Month Selector */}
           <TouchableOpacity
             style={[commonStyles.card, { backgroundColor: colors.card }]}
@@ -109,6 +143,7 @@ function HomeScreen() {
           {/* Calendar */}
           {currentMonthBudget && selectedMonth && (
             <Calendar
+              key={`calendar-${selectedMonth.month}-${selectedMonth.year}-${currentMonthBudget.days.length}-${currentMonthBudget.updatedAt}-${refreshTrigger}`}
               month={selectedMonth.month}
               year={selectedMonth.year}
               days={currentMonthBudget.days}
@@ -174,6 +209,11 @@ function HomeScreen() {
               </View>
             </View>
           )}
+          
+          {/* Banner publicitaire */}
+          <View style={{ marginVertical: 10 }}>
+            <AdBanner />
+          </View>
         </ScrollView>
       </View>
 
