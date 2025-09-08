@@ -160,6 +160,7 @@ export default function DayDetailsScreen() {
       return;
     }
 
+    showAd(); // Ad avant coller
     // Remplacer tous les items du repas
     await replaceMealItems(date, mealType, mealToPaste.items);
     loadDayBudget();
@@ -170,6 +171,7 @@ export default function DayDetailsScreen() {
   };
 
   const handleDuplicateToDate = async (targetDate: string, meals: Meal[]) => {
+    showAd(); // Ad avant duplication
     console.log('Duplicating to date:', targetDate, 'meals:', meals);
     await duplicateFullDay(targetDate, meals);
     await forceRefreshCurrentMonth();
@@ -180,6 +182,7 @@ export default function DayDetailsScreen() {
   };
 
   const handleBulkPlan = async (dates: string[], meals: Meal[]) => {
+    showAd(); // Ad avant planification par lot
     console.log('Bulk planning for dates:', dates, 'meals:', meals);
     
     for (const targetDate of dates) {

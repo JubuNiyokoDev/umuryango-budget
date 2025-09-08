@@ -13,8 +13,9 @@ import LoadingButton from '../components/LoadingButton';
 import PinModal from '../components/PinModal';
 import DataDeletionModal from '../components/DataDeletionModal';
 import { useImportExport } from '../hooks/useImportExport';
-import { AdBanner } from '../components/AdBanner';
-import { useInterstitialAd } from '../hooks/useInterstitialAd';
+import { StartIOBanner } from '../components/StartIOBanner';
+import { useStartIO } from '../hooks/useStartIO';
+import { useRewardedAd } from '../hooks/useRewardedAd';
 
 export default function SettingsScreen() {
   const { language, changeLanguage, t } = useTranslation();
@@ -37,7 +38,8 @@ export default function SettingsScreen() {
   } = useImportExport();
   const { colors, commonStyles } = useStyles();
   const forceUpdate = useForceUpdate();
-  const { showAd } = useInterstitialAd();
+  const { showInterstitial, showRewardedVideo } = useStartIO();
+  const { showRewardedAd } = useRewardedAd();
 
   const [pinModalVisible, setPinModalVisible] = useState(false);
   const [pinModalMode, setPinModalMode] = useState<'create' | 'verify'>(
@@ -50,6 +52,7 @@ export default function SettingsScreen() {
   } | null>(null);
 
   const handleLanguageChange = () => {
+    showInterstitial(); // Ad avant changement langue
     Alert.alert(t('language'), 'Choisissez votre langue préférée', [
       { text: t('cancel'), style: 'cancel' },
       {
@@ -68,6 +71,7 @@ export default function SettingsScreen() {
   };
 
   const handleThemeChange = () => {
+    showInterstitial(); // Ad avant changement thème
     Alert.alert(t('theme'), 'Choisissez votre thème préféré', [
       { text: t('cancel'), style: 'cancel' },
       {
@@ -86,6 +90,7 @@ export default function SettingsScreen() {
   };
 
   const handlePinSetup = () => {
+    showInterstitial(); // Ad avant configuration PIN
     if (hasPin) {
       Alert.alert(t('pin') + ' de sécurité', t('whatWouldYouLikeToDo'), [
         { text: t('cancel'), style: 'cancel' },
@@ -204,11 +209,12 @@ export default function SettingsScreen() {
   };
 
   const handleDataDeletion = () => {
+    showInterstitial(); // Ad avant suppression données
     setDeleteModalVisible(true);
   };
 
   const handleExportData = async () => {
-    showAd(); // Affiche la pub avant l'export
+    showInterstitial(); // Affiche la pub avant l'export
     Alert.alert(
       t('exportData'),
       t('exportDataDescription'),
@@ -228,6 +234,7 @@ export default function SettingsScreen() {
   };
 
   const handleImportData = async () => {
+    showInterstitial(); // Affiche la pub avant l'import
     Alert.alert(
       t('importData'),
       `${t('importDescription')}\n\n${t('dataWillBeMerged')}\n${t(
@@ -646,9 +653,9 @@ export default function SettingsScreen() {
             </View>
           </View>
           
-          {/* Banner publicitaire */}
+          {/* Banner Start.io */}
           <View style={{ marginVertical: 10 }}>
-            <AdBanner />
+            <StartIOBanner />
           </View>
         </ScrollView>
       </View>

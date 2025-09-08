@@ -14,12 +14,14 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useAppState } from '../contexts/AppStateContext';
 import { translateMonth } from '../utils/dateUtils';
 import { AdBanner } from '../components/AdBanner';
+import { useInterstitialAd } from '../hooks/useInterstitialAd';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
   const { isFirstLaunch, loading: pinLoading } = usePin();
   const { refreshTrigger } = useAppState();
+  const { showAd } = useInterstitialAd();
   const [showMonthSelector, setShowMonthSelector] = useState(false);
   const [pinSetupComplete, setPinSetupComplete] = useState(false);
 
@@ -53,6 +55,8 @@ export default function HomeScreen() {
   }, [refreshTrigger]);
 
   const handleDayPress = (date: string) => {
+    // Afficher pub avant action importante
+    showAd();
     router.push(`/day-details?date=${date}`);
   };
 
@@ -210,7 +214,7 @@ export default function HomeScreen() {
             </View>
           )}
           
-          {/* Banner publicitaire */}
+          {/* Banner AdMob */}
           <View style={{ marginVertical: 10 }}>
             <AdBanner />
           </View>

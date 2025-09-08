@@ -11,6 +11,7 @@ import Shimmer from '../components/Shimmer';
 import { useTranslation } from '../hooks/useTranslation';
 import { translateMonth } from '../utils/dateUtils';
 import { AdBanner } from '../components/AdBanner';
+import { useInterstitialAd } from '../hooks/useInterstitialAd';
 
 export default function BudgetScreen() {
   const { t } = useTranslation();
@@ -30,6 +31,8 @@ export default function BudgetScreen() {
     refreshData,
   } = useBudget();
   
+  const { showAd } = useInterstitialAd();
+  
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -39,6 +42,8 @@ export default function BudgetScreen() {
   };
 
   const handleAddContributor = async () => {
+    // Afficher pub avant action importante
+    showAd();
     if (!currentMonthBudget || currentMonthBudget.totalBudget === 0) {
       Alert.alert(
         t('budgetRequired'),
@@ -64,6 +69,7 @@ export default function BudgetScreen() {
       setContributorName('');
       setContributorAmount('');
       setShowAddContributor(false);
+      showAd(); // Ad après ajout contributeur réussi
       Alert.alert(t('success'), t('contributorAdded'));
     } catch (error) {
       console.log('Error adding contributor:', error);
@@ -74,6 +80,8 @@ export default function BudgetScreen() {
   };
 
   const handleUpdateContributorPayment = async (contributorId: string, currentPaid: number) => {
+    // Afficher pub avant action importante
+    showAd();
     Alert.prompt(
       t('updatePayment'),
       t('enterNewPaidAmount'),
@@ -235,7 +243,7 @@ export default function BudgetScreen() {
             )}
           </View>
           
-          {/* Banner publicitaire */}
+          {/* Banner AdMob */}
           <View style={{ marginVertical: 10 }}>
             <AdBanner />
           </View>

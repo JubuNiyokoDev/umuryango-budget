@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { View, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 // import mobileAds from 'react-native-google-mobile-ads';
+import { useStartIO } from './hooks/useStartIO';
+import { useAppOpenAd } from './hooks/useAppOpenAd';
 
 import HomeScreen from './app/home';
 import BudgetScreen from './app/budget';
@@ -19,10 +21,18 @@ type Screen = 'home' | 'budget' | 'history' | 'settings' | 'day-details';
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const { initialize } = useStartIO();
+  const { showAppOpenAd } = useAppOpenAd();
 
   useEffect(() => {
     // Initialise AdMob
     // mobileAds().initialize();
+    
+    // Initialise Start.io
+    initialize();
+    
+    // Show App Open Ad
+    setTimeout(() => showAppOpenAd(), 2000);
     // Masque le splash natif une fois l'app prête
     SplashScreen.hide();
   }, []);

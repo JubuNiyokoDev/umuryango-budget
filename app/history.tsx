@@ -10,7 +10,9 @@ import Icon from '../components/Icon';
 import Shimmer from '../components/Shimmer';
 import { useTranslation } from '../hooks/useTranslation';
 import { translateMonth } from '../utils/dateUtils';
-import { AdBanner } from '../components/AdBanner';
+import { StartIOBanner } from '../components/StartIOBanner';
+import { NativeAdView } from '../components/NativeAdView';
+import { useStartIO } from '../hooks/useStartIO';
 
 export default function HistoryScreen() {
   const { t } = useTranslation();
@@ -19,6 +21,7 @@ export default function HistoryScreen() {
   const [showMonthDetails, setShowMonthDetails] = useState(false);
 
   const { budgetHistory, loading, refreshData } = useBudget();
+  const { showInterstitial } = useStartIO();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -54,6 +57,7 @@ export default function HistoryScreen() {
   };
 
   const handleMonthPress = (month: MonthlyBudget) => {
+    showInterstitial(); // Ad avant voir détails mois
     setSelectedMonth(month);
     setShowMonthDetails(true);
   };
@@ -168,9 +172,12 @@ export default function HistoryScreen() {
               })
           )}
           
-          {/* Banner publicitaire */}
+          {/* Native Ad */}
+          <NativeAdView />
+          
+          {/* Banner Start.io */}
           <View style={{ marginVertical: 10 }}>
-            <AdBanner />
+            <StartIOBanner />
           </View>
         </ScrollView>
       </View>
@@ -240,6 +247,7 @@ export default function HistoryScreen() {
                         key={day.id}
                         style={[styles.dayItem, { borderBottomColor: colors.border }]}
                         onPress={() => {
+                          showInterstitial(); // Affiche la pub avant voir détails jour
                           setShowMonthDetails(false);
                           router.push(`/day-details?date=${day.date}`);
                         }}
