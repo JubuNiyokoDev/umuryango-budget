@@ -2,7 +2,8 @@ name: Build and Deploy Multi-Architecture APKs
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:

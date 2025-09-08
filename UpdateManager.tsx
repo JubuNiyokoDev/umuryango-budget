@@ -12,7 +12,7 @@ import * as IntentLauncher from 'expo-intent-launcher';
 import * as Device from 'expo-device';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const CURRENT_VERSION = 'v23';
+const CURRENT_VERSION = 'v26';
 const GITHUB_API =
   'https://api.github.com/repos/JubuNiyokoDev/umuryango-budget/releases/latest';
 
