@@ -1,4 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.jubuniyokodev.umuryangobudget">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" 
+  xmlns:tools="http://schemas.android.com/tools" 
+  package="com.jubuniyokodev.umuryangobudget">
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -17,7 +19,8 @@
     
     <meta-data
       android:name="com.google.android.gms.ads.APPLICATION_ID"
-      android:value="ca-app-pub-2300546388710165~1923776861"/>
+      android:value="ca-app-pub-2300546388710165~1923776861"
+      tools:replace="android:value"/>
     
     <activity 
       android:name=".MainActivity" 
