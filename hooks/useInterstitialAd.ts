@@ -16,26 +16,33 @@ export const useInterstitialAd = () => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    if (!InterstitialAd) return;
+    if (!InterstitialAd) {
+      console.log('AdMob InterstitialAd not available');
+      return;
+    }
     
-    const interstitial = InterstitialAd.createForAdRequest(AdMobConfig.interstitialId);
-    
-    const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-      setLoaded(true);
-    });
+    try {
+      const interstitial = InterstitialAd.createForAdRequest(AdMobConfig.interstitialId);
+      
+      const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+        setLoaded(true);
+      });
 
-    const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-      setLoaded(false);
+      const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+        setLoaded(false);
+        interstitial.load();
+      });
+
       interstitial.load();
-    });
+      setInterstitialAd(interstitial);
 
-    interstitial.load();
-    setInterstitialAd(interstitial);
-
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeClosed();
-    };
+      return () => {
+        unsubscribeLoaded();
+        unsubscribeClosed();
+      };
+    } catch (error) {
+      console.log('Error initializing AdMob interstitial:', error);
+    }
   }, []);
 
   const showAd = () => {
