@@ -1,10 +1,7 @@
 name: Build and Deploy Multi-Architecture APKs
 
 on:
-  push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
+  workflow_dispatch: # ⚡️ uniquement déclenché manuellement
 
 jobs:
   build:
@@ -93,7 +90,7 @@ jobs:
           name: apks
           path: android/app/build/outputs/apk/release/*.apk
 
-      # Create GitHub Release (if not exist) using GH_PAT
+      # Create GitHub Release (manual run will still create release)
       - name: Create GitHub Release
         id: gh_release
         uses: softprops/action-gh-release@v1
