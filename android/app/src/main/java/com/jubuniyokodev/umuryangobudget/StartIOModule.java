@@ -7,21 +7,21 @@ import com.startapp.sdk.adsbase.StartAppAd;
 import com.startapp.sdk.adsbase.StartAppSDK;
 
 public class StartIOModule extends ReactContextBaseJavaModule {
-    
+
     public StartIOModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
-    
+
     @Override
     public String getName() {
         return "StartIOModule";
     }
-    
+
     @ReactMethod
     public void initialize(String appId) {
         StartAppSDK.init(getCurrentActivity(), appId, false);
     }
-    
+
     @ReactMethod
     public void showInterstitial() {
         StartAppAd startAppAd = new StartAppAd(getCurrentActivity());

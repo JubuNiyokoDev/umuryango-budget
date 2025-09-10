@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { AppOpenAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
 
-import { AdMobConfig } from '../config/admob';
-
 const adUnitId = AdMobConfig.appOpenId;
 
 export const useAppOpenAd = () => {

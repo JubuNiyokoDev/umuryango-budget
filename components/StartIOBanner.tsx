@@ -4,8 +4,7 @@ import { useStyles } from '../styles/commonStyles';
 
 export const StartIOBanner = () => {
   const { colors } = useStyles();
-  
-  // Placeholder pour Start.io - sera implémenté avec le bridge natif
+
   return (
     <View style={{ 
       height: 50, 
@@ -17,7 +16,7 @@ export const StartIOBanner = () => {
       borderWidth: 1,
       borderColor: colors.border
     }}>
-      <Text style={{ color: colors.primary, fontSize: 12 }}>Start.io Ad Space</Text>
+      <Text style={{ color: colors.text, fontSize: 12 }}>Start.io Banner</Text>
     </View>
   );
 };

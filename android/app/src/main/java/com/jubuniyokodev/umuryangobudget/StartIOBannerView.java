@@ -3,7 +3,6 @@ package com.jubuniyokodev.umuryangobudget;
 import android.content.Context;
 import android.widget.LinearLayout;
 import com.startapp.sdk.adsbase.StartAppAd;
-import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener;
 
 public class StartIOBannerView extends LinearLayout {
     private StartAppAd startAppAd;
