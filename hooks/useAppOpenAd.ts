@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { AppOpenAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
+import { AdMobConfig } from '../config/admob';
 
 const adUnitId = AdMobConfig.appOpenId;
 
@@ -9,7 +10,8 @@ export const useAppOpenAd = () => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const appOpen = AppOpenAd.createForAdRequest(adUnitId);
+    try {
+      const appOpen = AppOpenAd.createForAdRequest(adUnitId);
     
     const unsubscribeLoaded = appOpen.addAdEventListener(AdEventType.LOADED, () => {
       setLoaded(true);
@@ -33,11 +35,14 @@ export const useAppOpenAd = () => {
 
     const subscription = AppState.addEventListener('change', handleAppStateChange);
 
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeClosed();
-      subscription?.remove();
-    };
+      return () => {
+        unsubscribeLoaded();
+        unsubscribeClosed();
+        subscription?.remove();
+      };
+    } catch (error) {
+      console.log('App Open Ad initialization failed:', error);
+    }
   }, []);
 
   const showAppOpenAd = () => {

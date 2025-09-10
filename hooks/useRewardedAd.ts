@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
+import { AdMobConfig } from '../config/admob';
 
 const adUnitId = AdMobConfig.rewardedId;
 

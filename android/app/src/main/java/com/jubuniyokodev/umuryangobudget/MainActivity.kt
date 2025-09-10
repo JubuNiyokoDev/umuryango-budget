@@ -1,5 +1,5 @@
 package com.jubuniyokodev.umuryangobudget
-import expo.modules.splashscreen.SplashScreenManager
+// import expo.modules.splashscreen.SplashScreenManager // SUPPRIMÉ
 
 import android.os.Build
 import android.os.Bundle
@@ -13,21 +13,16 @@ import expo.modules.ReactActivityDelegateWrapper
 
 class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
-    // Set the theme to AppTheme BEFORE onCreate to support
-    // coloring the background, status bar, and navigation bar.
-    // This is required for expo-splash-screen.
-    // setTheme(R.style.AppTheme);
-    // @generated begin expo-splashscreen - expo prebuild (DO NOT MODIFY) sync-f3ff59a738c56c9a6119210cb55f0b613eb8b6af
-    SplashScreenManager.registerOnActivity(this)
-    // @generated end expo-splashscreen
-    super.onCreate(null)
+    // Splash screen supprimé pour éviter les blocages
+    // SplashScreenManager.registerOnActivity(this) // SUPPRIMÉ
+    super.onCreate(savedInstanceState)
   }
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
    * rendering of the component.
    */
-  override fun getMainComponentName(): String = "main"
+  override fun getMainComponentName(): String = "Umuryango Budget"
 
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]

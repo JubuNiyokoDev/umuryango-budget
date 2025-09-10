@@ -14,7 +14,7 @@ import DayDetailsScreen from './app/day-details-simple';
 import BottomNavigation from './components/BottomNavigation';
 import UpdateManager from './UpdateManager';
 import { PlanningClipboardProvider } from './contexts/PlanningClipboardContext';
-import { SplashScreen } from 'expo-router';
+// import { SplashScreen } from 'expo-router'; // Désactivé car cause des problèmes
 
 type Screen = 'home' | 'budget' | 'history' | 'settings' | 'day-details';
 
@@ -25,17 +25,29 @@ export default function App() {
   const { showAppOpenAd } = useAppOpenAd();
 
   useEffect(() => {
-    // Initialise AdMob
-    mobileAds().initialize();
+    // Initialise AdMob avec protection
+    try {
+      mobileAds().initialize();
+    } catch (error) {
+      console.log('AdMob initialization failed:', error);
+    }
     
-    // Initialise Start.io
-    initialize();
+    // Initialise Start.io avec protection
+    try {
+      initialize();
+    } catch (error) {
+      console.log('Start.io initialization failed:', error);
+    }
     
-    // Show App Open Ad
-    setTimeout(() => showAppOpenAd(), 2000);
+    // Show App Open Ad avec protection
+    try {
+      setTimeout(() => showAppOpenAd(), 2000);
+    } catch (error) {
+      console.log('App Open Ad failed:', error);
+    }
     
-    // Masque le splash natif une fois l'app prête
-    SplashScreen.hide();
+    // SplashScreen désactivé pour éviter les blocages
+    console.log('App ready - splash should hide automatically');
   }, []);
 
   const renderScreen = () => {
