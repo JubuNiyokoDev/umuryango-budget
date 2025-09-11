@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import mobileAds from 'react-native-google-mobile-ads';
@@ -14,7 +13,6 @@ import DayDetailsScreen from './app/day-details-simple';
 import BottomNavigation from './components/BottomNavigation';
 import UpdateManager from './UpdateManager';
 import { PlanningClipboardProvider } from './contexts/PlanningClipboardContext';
-// import { SplashScreen } from 'expo-router'; // Désactivé car cause des problèmes
 
 type Screen = 'home' | 'budget' | 'history' | 'settings' | 'day-details';
 
