@@ -6,9 +6,6 @@ def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
 react {
     entryFile = file("$rootDir/../index.js")
-    bundleCommand = "npx react-native bundle"
-    bundleInRelease = true
-    bundleInDebug = false
     
     autolinkLibrariesWithApp()
 }
