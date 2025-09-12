@@ -1,15 +1,31 @@
 import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
-import { AppOpenAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
-import { AdMobConfig } from '../config/admob';
 
-const adUnitId = AdMobConfig.appOpenId;
+// Import protégé pour AdMob
+let AppOpenAd: any = null;
+let AdEventType: any = null;
+let adUnitId: string = '';
+
+try {
+  const admob = require('react-native-google-mobile-ads');
+  AppOpenAd = admob.AppOpenAd;
+  AdEventType = admob.AdEventType;
+  const { AdMobConfig } = require('../config/admob');
+  adUnitId = AdMobConfig.appOpenId;
+} catch (error) {
+  console.log('Google Mobile Ads not available:', error);
+}
 
 export const useAppOpenAd = () => {
-  const [appOpenAd, setAppOpenAd] = useState<AppOpenAd | null>(null);
+  const [appOpenAd, setAppOpenAd] = useState<any>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    if (!AppOpenAd || !AdEventType || !adUnitId) {
+      console.log('AdMob not available for App Open Ad');
+      return;
+    }
+    
     try {
       const appOpen = AppOpenAd.createForAdRequest(adUnitId);
     

@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import mobileAds from 'react-native-google-mobile-ads';
 import { useStartIO } from './hooks/useStartIO';
-import { useAppOpenAd } from './hooks/useAppOpenAd';
 
 import HomeScreen from './app/home';
 import BudgetScreen from './app/budget';
@@ -20,29 +18,19 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const { initialize } = useStartIO();
-  const { showAppOpenAd } = useAppOpenAd();
 
   useEffect(() => {
-    // Initialise AdMob avec protection
-    try {
-      mobileAds().initialize();
-    } catch (error) {
-      console.log('AdMob initialization failed:', error);
-    }
+    const initializeAds = async () => {
+      // Initialise Start.io avec protection
+      try {
+        initialize();
+        console.log('Start.io initialized successfully');
+      } catch (error) {
+        console.log('Start.io initialization failed:', error);
+      }
+    };
     
-    // Initialise Start.io avec protection
-    try {
-      initialize();
-    } catch (error) {
-      console.log('Start.io initialization failed:', error);
-    }
-    
-    // Show App Open Ad avec protection
-    try {
-      setTimeout(() => showAppOpenAd(), 2000);
-    } catch (error) {
-      console.log('App Open Ad failed:', error);
-    }
+    initializeAds();
     
     // SplashScreen désactivé pour éviter les blocages
     console.log('App ready - splash should hide automatically');

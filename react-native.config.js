@@ -1,8 +1,11 @@
 module.exports = {
   dependencies: {
-    'react-native-fbads': {
+    'react-native-google-mobile-ads': {
       platforms: {
-        android: null, // disable Android platform, other platforms will still autolink if provided
+        android: {
+          sourceDir: '../node_modules/react-native-google-mobile-ads/android/',
+          packageImportPath: 'io.invertase.googlemobileads.ReactNativeGoogleMobileAdsPackage',
+        },
       },
     },
   },

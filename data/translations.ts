@@ -38,7 +38,6 @@ export const translations = {
     contribution: 'Contribution',
     paid: 'Payé',
     shouldContribute: 'Doit contribuer',
-    remaining: 'Reste',
     overpaid: 'Surplus',
 
     // History
@@ -310,14 +309,14 @@ export const translations = {
     enterNewPaidAmount: 'Entrez le nouveau montant payé:',
     paymentUpdated: 'Paiement mis à jour',
     cannotUpdatePayment: 'Impossible de mettre à jour le paiement',
-    
+
     // MealSection
     pleaseEnterValidPrice: 'Veuillez entrer un prix valide',
-    deleteItem: 'Supprimer l\'article',
+    deleteItem: "Supprimer l'article",
     confirmDeleteItem: 'Êtes-vous sûr de vouloir supprimer cet article?',
     by: 'Par',
     previous: 'Précédent',
-    
+
     // Planning Actions
     planningActions: 'Actions de planification',
     copyDay: 'Copier la journée',
@@ -328,9 +327,11 @@ export const translations = {
     dayOf: 'Journée du',
     elements: 'éléments',
     mealCopied: 'Repas copié avec succès',
-    cannotPasteDifferentMealType: 'Vous ne pouvez coller que le même type de repas',
+    cannotPasteDifferentMealType:
+      'Vous ne pouvez coller que le même type de repas',
     replaceContent: 'Remplacer le contenu ?',
-    mealAlreadyHasItems: 'Ce repas contient déjà des éléments. Voulez-vous les remplacer ?',
+    mealAlreadyHasItems:
+      'Ce repas contient déjà des éléments. Voulez-vous les remplacer ?',
     replace: 'Remplacer',
     duplicateTo: 'Dupliquer vers quels jours ?',
     planMultipleDays: 'Planifier plusieurs jours',
@@ -340,7 +341,7 @@ export const translations = {
     planningAppliedToMultipleDays: 'Planification appliquée à {count} jour(s)',
     clipboardInfo: 'Copié: {info}',
     morningMeal: 'Matin',
-    noonMeal: 'Midi', 
+    noonMeal: 'Midi',
     eveningMeal: 'Soir',
 
     // Meal times
@@ -495,7 +496,6 @@ export const translations = {
     contribution: 'Uruhare',
     paid: 'Yaratanzeko',
     shouldContribute: 'Agomba gutanga',
-    remaining: 'Asigaye',
     overpaid: 'Yarenze',
 
     // History
@@ -665,6 +665,12 @@ export const translations = {
     fileSaved: 'Dosiye yabitswe',
     fileReadyToBeSaved: 'Dosiye yiteguye kubikwa',
 
+    // Additional missing translations
+    noItemsAdded: 'Nta kintu cyongewe',
+    spendingLevel: "Urwego rw'amafaranga",
+    currentMonth: 'Ukwezi gukurikira',
+    dayOfWeek: "Umusi w'icyumweru",
+
     // Budget calculation message
     budgetCalculatedFromMeals:
       "Ingengo y'amafaranga ibarwa ukurikije ivy'imirinduro yawe",
@@ -718,13 +724,13 @@ export const translations = {
     enterNewPaidAmount: 'Injiza amafaranga mashya yishyuwe:',
     paymentUpdated: 'Kwishyura byavuguruwe',
     cannotUpdatePayment: 'Ntishobora kuvugurura kwishyura',
-    
+
     // MealSection
     pleaseEnterValidPrice: 'Injiza igiciro nyacyo',
     deleteItem: 'Siba ikintu',
     confirmDeleteItem: 'Uremeza gusiba iki kintu?',
     by: 'Na',
-    
+
     // Planning Actions
     planningActions: 'Ibikorwa vyo gutegura',
     copyDay: 'Koporora umusi',
@@ -735,7 +741,8 @@ export const translations = {
     dayOf: 'Umusi wa',
     elements: 'ibintu',
     mealCopied: 'Ifunguro ryakoporoye neza',
-    cannotPasteDifferentMealType: 'Ushobora gushira ubwoko bumwe bw\'ifunguro gusa',
+    cannotPasteDifferentMealType:
+      "Ushobora gushira ubwoko bumwe bw'ifunguro gusa",
     replaceContent: 'Gusimbura ibiri ?',
     mealAlreadyHasItems: 'Iri funguro rifise ibintu. Urashaka kubisimbura ?',
     replace: 'Simbura',

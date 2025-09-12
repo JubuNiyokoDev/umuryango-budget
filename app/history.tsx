@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, RefreshControl } from 'react-native';
 import BottomNavigation from '../components/BottomNavigation';
@@ -10,18 +9,15 @@ import Icon from '../components/Icon';
 import Shimmer from '../components/Shimmer';
 import { useTranslation } from '../hooks/useTranslation';
 import { translateMonth } from '../utils/dateUtils';
-import { StartIOBanner } from '../components/StartIOBanner';
-import { NativeAdView } from '../components/NativeAdView';
-import { useStartIO } from '../hooks/useStartIO';
 
-export default function HistoryScreen() {
+
+function HistoryScreen() {
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
   const [selectedMonth, setSelectedMonth] = useState<MonthlyBudget | null>(null);
   const [showMonthDetails, setShowMonthDetails] = useState(false);
 
   const { budgetHistory, loading, refreshData } = useBudget();
-  const { showInterstitial } = useStartIO();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -57,7 +53,6 @@ export default function HistoryScreen() {
   };
 
   const handleMonthPress = (month: MonthlyBudget) => {
-    showInterstitial(); // Ad avant voir détails mois
     setSelectedMonth(month);
     setShowMonthDetails(true);
   };
@@ -171,14 +166,7 @@ export default function HistoryScreen() {
                 );
               })
           )}
-          
-          {/* Native Ad */}
-          <NativeAdView />
-          
-          {/* Banner Start.io */}
-          <View style={{ marginVertical: 10 }}>
-            <StartIOBanner />
-          </View>
+
         </ScrollView>
       </View>
 
@@ -247,7 +235,6 @@ export default function HistoryScreen() {
                         key={day.id}
                         style={[styles.dayItem, { borderBottomColor: colors.border }]}
                         onPress={() => {
-                          showInterstitial(); // Affiche la pub avant voir détails jour
                           setShowMonthDetails(false);
                           router.push(`/day-details?date=${day.date}`);
                         }}
@@ -312,7 +299,7 @@ const styles = {
     overflow: 'hidden' as const,
   },
   progressFill: {
-    height: '100%',
+    height: 4,
     borderRadius: 2,
   },
   modalOverlay: {
@@ -324,7 +311,7 @@ const styles = {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 24,
-    maxHeight: '80%',
+    maxHeight: '80%' as any,
   },
   statsSection: {
     paddingBottom: 20,
@@ -339,7 +326,7 @@ const styles = {
   },
   detailStatItem: {
     flex: 1,
-    minWidth: '30%',
+    minWidth: '30%' as any,
     alignItems: 'center' as const,
   },
   detailStatValue: {
@@ -385,4 +372,4 @@ const styles = {
   },
 };
 
-
+export default HistoryScreen;
