@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useStyles } from '../styles/commonStyles';
 import Icon from './Icon';
 import { useTranslation } from '../hooks/useTranslation';
+import { TranslationKey } from '../data/translations';
 
 interface BottomNavigationProps {
   currentTab?: string;
@@ -14,7 +15,7 @@ export default function BottomNavigation({ currentTab = 'home', onTabPress }: Bo
   const { t } = useTranslation();
   const { colors, commonStyles } = useStyles();
 
-  const tabs = [
+  const tabs: { name: TranslationKey; icon: string; route: string }[] = [
     { name: 'home', icon: 'calendar-outline', route: '/home' },
     { name: 'budget', icon: 'wallet-outline', route: '/budget' },
     { name: 'history', icon: 'time-outline', route: '/history' },

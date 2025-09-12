@@ -671,6 +671,59 @@ export const translations = {
     currentMonth: 'Ukwezi gukurikira',
     dayOfWeek: "Umusi w'icyumweru",
 
+    // Day names short
+    sun: 'Cyu',
+    mon: 'Mbe',
+    tue: 'Kab',
+    wed: 'Gat',
+    thu: 'Kan',
+    fri: 'Gtn',
+    sat: 'Gtd',
+
+    // Numbers for days
+    day1: '1',
+    day2: '2',
+    day3: '3',
+    day4: '4',
+    day5: '5',
+    day6: '6',
+    day7: '7',
+    day8: '8',
+    day9: '9',
+    day10: '10',
+    day11: '11',
+    day12: '12',
+    day13: '13',
+    day14: '14',
+    day15: '15',
+    day16: '16',
+    day17: '17',
+    day18: '18',
+    day19: '19',
+    day20: '20',
+    day21: '21',
+    day22: '22',
+    day23: '23',
+    day24: '24',
+    day25: '25',
+    day26: '26',
+    day27: '27',
+    day28: '28',
+    day29: '29',
+    day30: '30',
+    day31: '31',
+
+    // Status messages
+    dataExportedSuccessfully: 'Amakuru yasohowe neza',
+    chooseWhereToSaveFile: 'Hitamo aho kubika dosiye',
+    fileSavedSuccessfully: 'Dosiye yabitswe neza',
+
+    // Common UI elements
+    close: 'Funga',
+    open: 'Fungura',
+    back: 'Subira',
+    previous: 'Ibanjirije',
+
     // Budget calculation message
     budgetCalculatedFromMeals:
       "Ingengo y'amafaranga ibarwa ukurikije ivy'imirinduro yawe",
@@ -756,6 +809,107 @@ export const translations = {
     morningMeal: 'Bukeye',
     noonMeal: 'Saa sita',
     eveningMeal: 'Nimugoroba',
+
+    // Meal times
+    breakfast: 'Ifunguro ryo mu gitondo',
+    lunch: 'Ifunguro ryo mu musi',
+    dinner: 'Ifunguro ryo nimugoroba',
+
+    // Calendar
+    tomorrow: 'Ejo',
+    yesterday: 'Ejo hashize',
+
+    // Budget status
+    budgetExceeded: 'Ingengo yarenze',
+    budgetOnTrack: 'Ingengo ikurikizwa',
+    noBudgetSet: 'Nta ngengo yateguwe',
+
+    // Validation
+    pleaseEnterValidAmount: 'Injiza amafaranga yemewe',
+    pleaseEnterItemName: "Injiza izina ry'ikintu",
+    fieldRequired: 'Igice kirakenewe',
+
+    // Export/Import additional
+    processingData: 'Gukora amakuru...',
+
+    // Settings additional
+    resetApp: 'Subiza porogaramu',
+    clearAllData: 'Siba amakuru yose',
+    backupData: 'Bika amakuru',
+    restoreData: 'Garura amakuru',
+
+    // Notifications
+    budgetAlert: "Iburira ry'ingengo",
+    dailyReminder: 'Iburira rya buri munsi',
+    weeklyReport: "Raporo y'icyumweru",
+
+    // Time periods
+    daily: 'Buri munsi',
+    weekly: 'Buri cyumweru',
+    monthly: 'Buri kwezi',
+    yearly: 'Buri mwaka',
+
+    // Actions
+    duplicate: 'Gusubiramo',
+    copy: 'Koporora',
+    paste: 'Shira',
+    cut: 'Kata',
+    undo: 'Subiza',
+    redo: 'Ongera ukore',
+
+    // Status indicators
+    online: 'Kuri interineti',
+    offline: 'Ntakuri interineti',
+    syncing: 'Biriko bihuza...',
+    synced: 'Byahujwe',
+
+    // File operations
+    fileNotFound: 'Dosiye ntiyabonetse',
+    fileCorrupted: 'Dosiye yangiritse',
+    fileTooLarge: 'Dosiye inini cyane',
+    fileUploaded: 'Dosiye yashyizwe',
+
+    // Permissions
+    permissionRequired: 'Uruhushya rurakenewe',
+    grantPermission: 'Tanga uruhushya',
+    permissionGranted: 'Uruhushya rwatanzwe',
+
+    // Network
+    noInternetConnection: 'Nta interineti',
+    connectionLost: 'Interineti yabuze',
+    reconnecting: 'Biriko bigaruka...',
+    connected: 'Byahujwe',
+
+    // Day details additional
+    information: 'Amakuru',
+    warning: 'Iburira',
+    dayAlreadyValidated: 'Uyu musi waremejwe',
+    noMealsPlannedValidateAnyway:
+      'Nta funguro ryateguwe kuri uyu musi. Urashaka kwemeza?',
+    validateDayConfirmation:
+      'Kwemeza uyu musi hamwe na {amount} {currency}?\n\nIyo wemeje, uyu musi ntuzongera guhindurwa.',
+    notPlanned: 'Ntivyateguwe',
+    status: 'Uko bimeze',
+    validatedOn: 'Byemejwe ku wa',
+    readOnlyModePastDay: 'Gusoma gusa - Umusi washize',
+    noPlanningForThisDay: 'Nta miteguro kuri uyu musi',
+    pastDayNoMealsPlanned:
+      'Uyu musi washize kandi ntiwari ufise amategeko',
+    dateNotSpecified: 'Itariki ntiyasobanuwe',
+
+    // Month names in Kirundi (for translation mapping)
+    janvier: 'Nzero',
+    février: 'Ruhuhuma',
+    mars: 'Ntwarante',
+    avril: 'Ndamukiza',
+    mai: 'Rusama',
+    juin: 'Ruheshi',
+    juillet: 'Mukakaro',
+    août: 'Myandagaro',
+    septembre: 'Nyakanga',
+    octobre: 'Gitugutu',
+    novembre: 'Munyonyo',
+    décembre: 'Kigarama',
   },
 };
 

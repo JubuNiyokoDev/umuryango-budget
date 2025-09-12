@@ -386,7 +386,7 @@ const styles = {
     padding: 20,
   },
   modalContent: {
-    width: '100%',
+    width: '100%' as const,
     maxWidth: 400,
     borderRadius: 12,
     padding: 20,
