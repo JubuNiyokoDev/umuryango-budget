@@ -5,7 +5,7 @@ apply plugin: "com.facebook.react"
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
 react {
-    entryFile = file("../index.js")
+    entryFile = file("$rootDir/../index.js")
     bundleCommand = "npx react-native bundle"
     bundleInRelease = true
     bundleInDebug = false
